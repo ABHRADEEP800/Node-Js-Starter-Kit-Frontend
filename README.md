@@ -67,4 +67,4 @@ export default tseslint.config([
   },
 ])
 ```
-# alpha-fitness-frontend
+# frontend
