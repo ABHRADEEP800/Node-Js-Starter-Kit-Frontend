@@ -1,0 +1,73 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Hide number input arrows for all browsers */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
+}
+
+/* Water Intake Grid Styles */
+.water-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.water-option {
+  @apply flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all duration-200 cursor-pointer text-center;
+  border-color: #e5e7eb;
+  background: #f9fafb;
+}
+
+.water-option.selected {
+  @apply border-blue-500 bg-blue-50 dark:bg-blue-900/20;
+}
+
+.water-option:hover:not(.selected) {
+  @apply border-gray-300 bg-gray-50;
+}
+
+.dark .water-option {
+  border-color: #4b5563;
+  background: #374151;
+}
+
+.dark .water-option.selected {
+  border-color: #3b82f6;
+  background: #1e3a8a20;
+}
+
+.dark .water-option:hover:not(.selected) {
+  border-color: #6b7280;
+  background: #4b5563;
+}
+
+/* Custom water input */
+.custom-water-input {
+  @apply w-full px-3 py-2 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition-all duration-200 text-center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .water-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .water-option {
+    padding: 10px 6px;
+    min-height: 60px;
+  }
+}
+
+@media (max-width: 380px) {
+  .water-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
