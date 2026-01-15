@@ -7,7 +7,6 @@ import type { UserLogin } from "../../types";
 import { toast } from "react-toastify";
 import userService from "../../services/userService";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
-import { setValue } from "../../util/localStorage";
 
 function LoginComponent() {
   const dispatch = useDispatch();
@@ -39,7 +38,6 @@ function LoginComponent() {
         if (res.data.twofaEnabled === true) {
           // Handle 2FA required case
           toast.info("Two-factor authentication is required.");
-          setValue("temp-token", res.data?.tempToken || "");
           navigate("/twofa");
         } else {
           dispatch(login(res.data.user));

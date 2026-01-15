@@ -62,12 +62,11 @@ class UserService {
   }
 
   async verifyLogin2FA(
-    tempToken: string | null,
-    code: string
+  code: string
   ): Promise<ApiResponse<{ user: User }>> {
     const response = await apiClient("/user/2fa/verify", {
       method: "POST",
-      body: JSON.stringify({ tempToken, code }),
+      body: JSON.stringify({ code }),
     });
 
     const data = await response.json();
