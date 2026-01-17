@@ -34,47 +34,37 @@ function Header() {
   }, []);
 
   // Navigation items for non-authenticated users
+  // Added 'end: true' to Home so it doesn't highlight on every page
   const publicNavItems = [
-    { name: "Home", url: "/", auth: true },
+    { name: "Home", url: "/", auth: true, end: true }, 
     { name: "Features", url: "#features", auth: true },
     { name: "About", url: "#about", auth: true },
   ];
 
   // Navigation items for authenticated users
+  // Added 'end: true' to Dashboards so they don't highlight when on sub-pages (e.g. Users)
   const privateNavItems = [
-    { name: "Dashboard", url: "/dashboard", auth: status },
+    { name: "Dashboard", url: "/dashboard", auth: status, end: true },
   ];
+  
   const adminNavItems = [
-    { name: "Dashboard", url: "/admin-dashboard", auth: status },
+    { name: "Dashboard", url: "/admin-dashboard", auth: status, end: true },
+    // Example: If you add Users later, you can leave end: false to keep it active on sub-pages
+    // { name: "Users", url: "/admin-dashboard/users", auth: status, end: false },
   ];
 
   // Function to handle anchor link clicks
   const handleAnchorClick = (url: string, close: () => void) => {
     if (url.startsWith("#")) {
       if (location.pathname !== "/") {
-        // Redirect to home first if not on home page
         navigate("/", { state: { scrollTo: url } });
       } else {
-        // Already on home page, just scroll to section
         const section = document.querySelector(url);
         if (section) {
           section.scrollIntoView({ behavior: "smooth" });
         }
       }
-      close(); // Close the mobile menu
-    }
-  };
-
-  // Check if a nav item should be active
-  const isActiveItem = (url: string) => {
-    if (url === "/") {
-      return location.pathname === "/";
-    } else if (url.startsWith("#")) {
-      // Never highlight anchor links as active
-      return false;
-    } else {
-      // Exact match for all paths
-      return location.pathname === url;
+      close();
     }
   };
 
@@ -168,9 +158,10 @@ function Header() {
                           <NavLink
                             key={item.name}
                             to={item.url}
-                            className={classNames(
+                            end={item.end} // Use the 'end' prop here
+                            className={({ isActive }) => classNames(
                               "text-sm font-semibold px-3 py-2 rounded-md transition-colors",
-                              isActiveItem(item.url)
+                              isActive
                                 ? "text-blue-600 bg-blue-50 dark:bg-blue-900/20"
                                 : "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
                             )}
@@ -186,24 +177,18 @@ function Header() {
                           <div key={item.name}>
                             {item.url.startsWith("#") ? (
                               <button
-                                onClick={() =>
-                                  handleAnchorClick(item.url, close)
-                                }
-                                className={classNames(
-                                  "text-sm font-semibold px-3 py-2 rounded-md transition-colors",
-                                  isActiveItem(item.url)
-                                    ? "text-blue-600 bg-blue-50 dark:bg-blue-900/20"
-                                    : "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
-                                )}
+                                onClick={() => handleAnchorClick(item.url, close)}
+                                className="text-sm font-semibold px-3 py-2 rounded-md transition-colors text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
                               >
                                 {item.name}
                               </button>
                             ) : (
                               <NavLink
                                 to={item.url}
-                                className={classNames(
+                                end={item.end} // Use the 'end' prop here
+                                className={({ isActive }) => classNames(
                                   "text-sm font-semibold px-3 py-2 rounded-md transition-colors",
-                                  isActiveItem(item.url)
+                                  isActive
                                     ? "text-blue-600 bg-blue-50 dark:bg-blue-900/20"
                                     : "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
                                 )}
@@ -261,9 +246,10 @@ function Header() {
                         onClick={close}
                         key={item.name}
                         to={item.url}
-                        className={classNames(
+                        end={item.end} // Use the 'end' prop here
+                        className={({ isActive }) => classNames(
                           "block text-sm font-medium py-2 px-3 rounded-md",
-                          isActiveItem(item.url)
+                          isActive
                             ? "text-blue-600 bg-blue-50 dark:bg-blue-900/20"
                             : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
                         )}
@@ -280,12 +266,7 @@ function Header() {
                         {item.url.startsWith("#") ? (
                           <button
                             onClick={() => handleAnchorClick(item.url, close)}
-                            className={classNames(
-                              "block text-sm font-medium py-2 px-3 rounded-md w-full text-left",
-                              isActiveItem(item.url)
-                                ? "text-blue-600 bg-blue-50 dark:bg-blue-900/20"
-                                : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-                            )}
+                            className="block text-sm font-medium py-2 px-3 rounded-md w-full text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
                           >
                             {item.name}
                           </button>
@@ -293,9 +274,10 @@ function Header() {
                           <NavLink
                             onClick={close}
                             to={item.url}
-                            className={classNames(
+                            end={item.end} // Use the 'end' prop here
+                            className={({ isActive }) => classNames(
                               "block text-sm font-medium py-2 px-3 rounded-md",
-                              isActiveItem(item.url)
+                              isActive
                                 ? "text-blue-600 bg-blue-50 dark:bg-blue-900/20"
                                 : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
                             )}
