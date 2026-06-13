@@ -20,6 +20,7 @@ import { registerSW } from "virtual:pwa-register";
 import Signup from "./pages/Signup.tsx";
 import AdminDashboardComponent from "./components/dashboard/AdminDashboardComponent.tsx";
 import Profile from "./components/user/profile.tsx";
+import VerifyEmail from "./pages/VerifyEmail.tsx";
 
 registerSW({ immediate: true });
 
@@ -42,6 +43,15 @@ const router = createBrowserRouter(
           element={
             <AuthLayout authentication={false}>
               <Signup />
+            </AuthLayout>
+          }
+        />
+
+        <Route
+          path="/verify-email"
+          element={
+            <AuthLayout authentication={false}>
+              <VerifyEmail />
             </AuthLayout>
           }
         />

@@ -15,18 +15,48 @@ const getUrl = (endpoint: string) => {
   return `${BASE_URL}${cleanEndpoint}`;
 };
 
+let cachedCsrfToken: string | null = null;
+let isFetchingCsrf = false;
+let csrfPromise: Promise<string> | null = null;
+
+const fetchCsrfToken = async (): Promise<string> => {
+  if (cachedCsrfToken) return cachedCsrfToken;
+  if (isFetchingCsrf && csrfPromise) return csrfPromise;
+
+  isFetchingCsrf = true;
+  csrfPromise = fetch(getUrl("/csrf-token"), { credentials: "include" })
+    .then((res) => res.json())
+    .then((data) => {
+      cachedCsrfToken = data.csrfToken;
+      isFetchingCsrf = false;
+      return cachedCsrfToken as string;
+    })
+    .catch(() => {
+      isFetchingCsrf = false;
+      return "strict";
+    });
+
+  return csrfPromise;
+};
+
 export const apiClient = async (
   endpoint: string,
   options: FetchOptions = {}
 ): Promise<Response> => {
   const { headers, ...restOptions } = options;
+  const method = options.method || "GET";
+
+  let csrfToken = "strict";
+  if (!["GET", "HEAD", "OPTIONS"].includes(method.toUpperCase())) {
+    csrfToken = await fetchCsrfToken();
+  }
 
   // 1. Default Configuration
   const config: RequestInit = {
     ...restOptions,
     headers: {
       "Content-Type": "application/json",
-      "X-CSRF-Token": "strict",
+      "x-csrf-token": csrfToken,
       ...headers,
     },
     credentials: "include", // 👈 Keeps cookies attached

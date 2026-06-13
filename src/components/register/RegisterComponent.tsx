@@ -2,14 +2,11 @@ import { Button, Input } from "../";
 import { useForm } from "react-hook-form";
 import UserService from "../../services/userService";
 import { Link, useNavigate } from "react-router-dom";
-import { login } from "../../store/auth/authSlice";
-import { useDispatch } from "react-redux";
 import type { UserSignup } from "../../types";
 import { toast } from "react-toastify";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 
 function RegisterComponent() {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { executeRecaptcha } = useGoogleReCaptcha();
 
@@ -32,9 +29,8 @@ function RegisterComponent() {
 
     UserService.userSignup({ ...data, recaptchaToken: token })
       .then((res) => {
-        dispatch(login(res.data.user));
         navigate("/signin");
-        toast.success(res.message);
+        toast.success(res.message, { autoClose: 10000 }); // Give them time to read the email instruction
       })
       .catch((err) => toast.error(err.message));
   };
