@@ -22,8 +22,7 @@ function App() {
         }
       })
       .catch(() => {
-        // ADDED: If the API call fails (e.g., invalid token), log the user out.
-        // dispatch(logout()); // TODO fix reload issue
+        dispatch(logout());
       })
       .finally(() => {
         setLoading(false);

@@ -36,35 +36,19 @@ function AuthLayout({
   if (!appIsReady) {
     return <Loading />;
   }
-  if (loggedInUser?.role !== role) {
-    if (loggedInUser?.role === "admin") {
-      return <Navigate to="/admin-dashboard" replace={true} />;
-    } else if (loggedInUser?.role === "user") {
-      return <Navigate to="/dashboard" replace={true} />;
-    }
-  }
-
-  // Case 1: Trying to access a protected route (`authentication={true}`) while not logged in.
-  if (authentication && authStatus !== authentication) {
+  // Case 1: Trying to access a protected route while not logged in.
+  if (authentication && !authStatus) {
     return <Navigate to="/signin" replace={true} />;
   }
 
-  // Case 2: Trying to access a public-only route (`authentication={false}`) while logged in.
-  if (
-    !authentication &&
-    authStatus !== authentication &&
-    role === loggedInUser?.role &&
-    role === "user"
-  ) {
-    return <Navigate to="/dashboard" replace={true} />;
+  // Case 2: Trying to access a protected route with wrong role
+  if (authentication && authStatus && loggedInUser?.role !== role) {
+    return <Navigate to={loggedInUser?.role === "admin" ? "/admin-dashboard" : "/dashboard"} replace={true} />;
   }
-  if (
-    !authentication &&
-    authStatus !== authentication &&
-    role === loggedInUser?.role &&
-    role === "admin"
-  ) {
-    return <Navigate to="/admin-dashboard" replace={true} />;
+
+  // Case 3: Trying to access a public-only route while logged in.
+  if (!authentication && authStatus) {
+    return <Navigate to={loggedInUser?.role === "admin" ? "/admin-dashboard" : "/dashboard"} replace={true} />;
   }
 
   // If all checks pass, render the requested component.

@@ -27,11 +27,6 @@ const authSlice = createSlice({
       state.loggedInUser = null;
       removeValue("access-token");
       removeValue("refresh-token");
-      //clears cookies too
-      document.cookie =
-        "device_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-      document.cookie =
-        "session_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     },
   },
 });
