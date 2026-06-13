@@ -14,6 +14,7 @@ interface TwoFAStatus {
 interface TwoFASecret {
   secret: string;
   qrCode: string;
+  backupCodes?: string[];
 }
 
 const TwoFASettingsPage = () => {
@@ -36,6 +37,20 @@ const TwoFASettingsPage = () => {
   const [step, setStep] = useState<"status" | "generating" | "verifying">(
     "status"
   );
+
+  const handleDownloadBackupCodes = () => {
+    if (!twoFASecret?.backupCodes) return;
+    const content = `${import.meta.env.VITE_PROJECT_NAME} - 2FA Backup Codes\n\n${twoFASecret.backupCodes.join('\n')}\n\nKeep these codes safe! Each code can only be used once.`;
+    const blob = new Blob([content], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${import.meta.env.VITE_PROJECT_NAME}_backup_codes.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   // --- Session State ---
   const [sessions, setSessions] = useState<SessionDevice[]>([]);
@@ -398,15 +413,36 @@ const TwoFASettingsPage = () => {
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                   Manual Entry Code:
                 </p>
-                <code className="bg-white dark:bg-gray-800 px-3 py-1 rounded border border-gray-300 dark:border-gray-600 select-all font-mono text-sm">
+                <code className="bg-white dark:bg-gray-800 px-3 py-1 rounded border border-gray-300 dark:border-gray-600 select-all font-mono text-sm block mb-6">
                   {twoFASecret.secret}
                 </code>
+
+                {twoFASecret.backupCodes && twoFASecret.backupCodes.length > 0 && (
+                  <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded text-left">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 gap-2">
+                      <h3 className="text-yellow-800 font-semibold">Save these Backup Codes!</h3>
+                      <button 
+                        onClick={handleDownloadBackupCodes}
+                        className="text-xs bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1.5 rounded transition shadow-sm font-medium w-full sm:w-auto"
+                      >
+                        ⬇ Download as .txt
+                      </button>
+                    </div>
+                    <p className="text-yellow-700 text-sm mb-3">If you lose your authenticator app, you can use these one-time codes to log in. Save them somewhere safe.</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 font-mono text-sm text-gray-800">
+                      {twoFASecret.backupCodes.map(code => (
+                        <div key={code} className="bg-white px-2 py-2 border border-yellow-300 rounded text-center tracking-wider">{code}</div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div className="mt-6">
                   <button
                     onClick={() => setStep("verifying")}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold w-full sm:w-auto"
                   >
-                    I've Scanned It
+                    I've Scanned It & Saved Backup Codes
                   </button>
                 </div>
               </div>

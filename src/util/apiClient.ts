@@ -26,6 +26,7 @@ export const apiClient = async (
     ...restOptions,
     headers: {
       "Content-Type": "application/json",
+      "X-CSRF-Token": "strict",
       ...headers,
     },
     credentials: "include", // 👈 Keeps cookies attached

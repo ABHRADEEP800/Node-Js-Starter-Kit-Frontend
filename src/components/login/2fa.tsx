@@ -12,6 +12,8 @@ const Login2FAPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [timeLeft, setTimeLeft] = useState(300); // 5 minutes
   const [verificationCode, setVerificationCode] = useState<string[]>(Array(6).fill(""));
+  const [isUsingBackupCode, setIsUsingBackupCode] = useState(false);
+  const [backupCode, setBackupCode] = useState("");
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   
   const dispatch = useDispatch();
@@ -83,8 +85,12 @@ const Login2FAPage: React.FC = () => {
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
-    const code = verificationCode.join("");
-    if (code.length !== 6) {
+    const code = isUsingBackupCode ? backupCode.trim().toLowerCase() : verificationCode.join("");
+    
+    if (isUsingBackupCode && code.length !== 8) {
+      toast.error("Please enter a valid 8-character backup code");
+      return;
+    } else if (!isUsingBackupCode && code.length !== 6) {
       toast.error("Please enter the complete 6-digit code");
       return;
     }
@@ -136,36 +142,56 @@ const Login2FAPage: React.FC = () => {
           2FA Verification
         </h1>
         <p className="text-center text-gray-600 dark:text-gray-400 mb-6 text-sm">
-          Enter the 6-digit code from your authenticator app.
+          {isUsingBackupCode 
+             ? "Enter one of your 8-character emergency backup codes."
+             : "Enter the 6-digit code from your authenticator app."}
         </p>
 
         <form onSubmit={handleVerify} className="space-y-6">
           
-          {/* 6 Digit Input Grid */}
-          <div className="flex justify-center gap-2 sm:gap-3" onPaste={handlePaste}>
-            {verificationCode.map((digit, index) => (
+          {/* Inputs */}
+          {isUsingBackupCode ? (
+            <div className="flex justify-center">
               <input
-                key={index}
-                ref={(el) => { inputRefs.current[index] = el; }}
-                type="text" 
-                inputMode="numeric"
-                maxLength={1}
-                value={digit}
-                onChange={(e) => handleDigitChange(index, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(index, e)}
+                type="text"
+                value={backupCode}
+                onChange={(e) => setBackupCode(e.target.value)}
                 disabled={isLoading || timeLeft === 0}
-                className={`
-                  w-10 h-10 sm:w-12 sm:h-12 
-                  text-center text-xl font-bold 
-                  rounded-lg border outline-none transition-all
+                placeholder="Enter 8-character code"
+                className={`w-full h-12 text-center text-xl font-bold tracking-widest rounded-lg border outline-none transition-all uppercase
                   ${error 
                     ? "border-red-500 bg-red-50 text-red-600 focus:ring-2 focus:ring-red-200" 
                     : "border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900"
                   }
                 `}
               />
-            ))}
-          </div>
+            </div>
+          ) : (
+            <div className="flex justify-center gap-2 sm:gap-3" onPaste={handlePaste}>
+              {verificationCode.map((digit, index) => (
+                <input
+                  key={index}
+                  ref={(el) => { inputRefs.current[index] = el; }}
+                  type="text" 
+                  inputMode="numeric"
+                  maxLength={1}
+                  value={digit}
+                  onChange={(e) => handleDigitChange(index, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(index, e)}
+                  disabled={isLoading || timeLeft === 0}
+                  className={`
+                    w-10 h-10 sm:w-12 sm:h-12 
+                    text-center text-xl font-bold 
+                    rounded-lg border outline-none transition-all
+                    ${error 
+                      ? "border-red-500 bg-red-50 text-red-600 focus:ring-2 focus:ring-red-200" 
+                      : "border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900"
+                    }
+                  `}
+                />
+              ))}
+            </div>
+          )}
 
           {/* Timer & Error Display */}
           <div className="flex justify-between items-center text-sm">
@@ -204,13 +230,16 @@ const Login2FAPage: React.FC = () => {
         </form>
 
         <p className="text-center mt-6 text-sm text-gray-700 dark:text-gray-300">
-          Lost your device?{" "}
+          {isUsingBackupCode ? "Found your device? " : "Lost your device? "}
           <button
             type="button"
             className="text-blue-600 dark:text-blue-400 font-medium hover:underline focus:outline-none"
-            onClick={() => toast.info("Please contact support to reset 2FA")}
+            onClick={() => {
+              setIsUsingBackupCode(!isUsingBackupCode);
+              setError(null);
+            }}
           >
-            Contact Support
+            {isUsingBackupCode ? "Use Authenticator App" : "Use Backup Code"}
           </button>
         </p>
 
