@@ -52,6 +52,18 @@ const TwoFASettingsPage = () => {
     URL.revokeObjectURL(url);
   };
 
+  const handleCopySecret = () => {
+    if (!twoFASecret?.secret) return;
+    navigator.clipboard
+      .writeText(twoFASecret.secret)
+      .then(() => {
+        toast.success("Secret key copied to clipboard!");
+      })
+      .catch(() => {
+        toast.error("Failed to copy secret key");
+      });
+  };
+
   // --- Session State ---
   const [sessions, setSessions] = useState<SessionDevice[]>([]);
   const [loadingSessions, setLoadingSessions] = useState(true);
@@ -413,9 +425,31 @@ const TwoFASettingsPage = () => {
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                   Manual Entry Code:
                 </p>
-                <code className="bg-white dark:bg-gray-800 px-3 py-1 rounded border border-gray-300 dark:border-gray-600 select-all font-mono text-sm block mb-6">
-                  {twoFASecret.secret}
-                </code>
+                <div className="flex flex-col sm:flex-row gap-2 justify-center items-center mb-6 max-w-full">
+                  <code className="bg-white dark:bg-gray-800 px-3 py-2 rounded border border-gray-300 dark:border-gray-600 font-mono text-xs sm:text-sm select-all break-all whitespace-pre-wrap flex-1 max-w-full w-full text-center sm:text-left">
+                    {twoFASecret.secret}
+                  </code>
+                  <button
+                    type="button"
+                    onClick={handleCopySecret}
+                    className="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow transition duration-200 flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
+                  >
+                    <svg
+                      className="w-3.5 h-3.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2.5}
+                        d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
+                      />
+                    </svg>
+                    Copy Key
+                  </button>
+                </div>
 
                 {twoFASecret.backupCodes &&
                   twoFASecret.backupCodes.length > 0 && (
