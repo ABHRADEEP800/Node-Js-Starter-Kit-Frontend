@@ -75,19 +75,27 @@ function LoginComponent() {
             })}
           />
 
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="rememberMe"
-              {...register("rememberMe")}
-              className="mr-2"
-            />
-            <label
-              htmlFor="rememberMe"
-              className="text-sm text-gray-700 dark:text-gray-300"
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="rememberMe"
+                {...register("rememberMe")}
+                className="mr-2"
+              />
+              <label
+                htmlFor="rememberMe"
+                className="text-sm text-gray-700 dark:text-gray-300"
+              >
+                Remember this device
+              </label>
+            </div>
+            <Link
+              to="/forgot-password"
+              className="text-sm text-blue-600 dark:text-blue-400 hover:underline font-medium"
             >
-              Remember this device
-            </label>
+              Forgot password?
+            </Link>
           </div>
 
           {/* Submit */}

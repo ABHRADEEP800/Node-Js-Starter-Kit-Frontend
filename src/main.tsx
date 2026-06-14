@@ -11,7 +11,7 @@ import {
 } from "react-router-dom";
 import { Provider } from "react-redux";
 import { store } from "./store/store.ts";
-import { Signin, Home } from "./pages/";
+import { Signin, Home, ForgotPassword, ResetPassword } from "./pages/";
 import { AuthLayout, DashboardComponent } from "./components/";
 import DashboardContainer from "./components/dashboard/DashbaordContainer.tsx";
 import Login2FAPage from "./components/login/2fa.tsx";
@@ -61,6 +61,22 @@ const router = createBrowserRouter(
           element={
             <AuthLayout authentication={false}>
               <Signin />
+            </AuthLayout>
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            <AuthLayout authentication={false}>
+              <ForgotPassword />
+            </AuthLayout>
+          }
+        />
+        <Route
+          path="/reset-password"
+          element={
+            <AuthLayout authentication={false}>
+              <ResetPassword />
             </AuthLayout>
           }
         />

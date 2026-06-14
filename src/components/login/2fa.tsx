@@ -11,11 +11,13 @@ const Login2FAPage: React.FC = () => {
   const [isCheckingSession, setIsCheckingSession] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [timeLeft, setTimeLeft] = useState(300); // 5 minutes
-  const [verificationCode, setVerificationCode] = useState<string[]>(Array(6).fill(""));
+  const [verificationCode, setVerificationCode] = useState<string[]>(
+    Array(6).fill("")
+  );
   const [isUsingBackupCode, setIsUsingBackupCode] = useState(false);
   const [backupCode, setBackupCode] = useState("");
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -26,10 +28,13 @@ const Login2FAPage: React.FC = () => {
         await userService.getCurrentUser();
         // If successful, user is already logged in
         toast.info("You are already logged in");
-        navigate("/"); 
+        navigate("/");
       } catch (err: any) {
         // Specific check: usually 403 or specific message implies 2FA is needed
-        if (err.message?.includes("2FA verification incomplete") || err.statusCode === 403) {
+        if (
+          err.message?.includes("2FA verification incomplete") ||
+          err.statusCode === 403
+        ) {
           setIsCheckingSession(false);
         } else {
           toast.error("Session expired. Please login again.");
@@ -61,12 +66,15 @@ const Login2FAPage: React.FC = () => {
     const newCode = [...verificationCode];
     newCode[index] = value;
     setVerificationCode(newCode);
-    
+
     // Auto-focus next input
     if (value && index < 5) inputRefs.current[index + 1]?.focus();
   };
 
-  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (
+    index: number,
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
     // Handle backspace to focus previous input
     if (e.key === "Backspace" && !verificationCode[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
@@ -75,9 +83,15 @@ const Login2FAPage: React.FC = () => {
 
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
-    const digits = e.clipboardData.getData("text").replace(/\D/g, "").split("").slice(0, 6);
+    const digits = e.clipboardData
+      .getData("text")
+      .replace(/\D/g, "")
+      .split("")
+      .slice(0, 6);
     const newCode = [...verificationCode];
-    digits.forEach((d, i) => { if (i < 6) newCode[i] = d; });
+    digits.forEach((d, i) => {
+      if (i < 6) newCode[i] = d;
+    });
     setVerificationCode(newCode);
     const focusIndex = digits.length < 6 ? digits.length : 5;
     inputRefs.current[focusIndex]?.focus();
@@ -85,8 +99,10 @@ const Login2FAPage: React.FC = () => {
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
-    const code = isUsingBackupCode ? backupCode.trim().toLowerCase() : verificationCode.join("");
-    
+    const code = isUsingBackupCode
+      ? backupCode.trim().toLowerCase()
+      : verificationCode.join("");
+
     if (isUsingBackupCode && code.length !== 8) {
       toast.error("Please enter a valid 8-character backup code");
       return;
@@ -128,7 +144,7 @@ const Login2FAPage: React.FC = () => {
   if (isCheckingSession) {
     return (
       <div className="flex justify-center items-center h-screen bg-gray-50 dark:bg-gray-900">
-         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
@@ -137,18 +153,16 @@ const Login2FAPage: React.FC = () => {
     <div className="flex justify-center items-center px-4 bg-gray-50 dark:bg-gray-900 min-h-screen pt-2">
       {/* Container matching LoginComponent */}
       <div className="w-full max-w-md bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700">
-        
         <h1 className="text-3xl sm:text-4xl font-extrabold text-center mb-2 text-gray-900 dark:text-white">
           2FA Verification
         </h1>
         <p className="text-center text-gray-600 dark:text-gray-400 mb-6 text-sm">
-          {isUsingBackupCode 
-             ? "Enter one of your 8-character emergency backup codes."
-             : "Enter the 6-digit code from your authenticator app."}
+          {isUsingBackupCode
+            ? "Enter one of your 8-character emergency backup codes."
+            : "Enter the 6-digit code from your authenticator app."}
         </p>
 
         <form onSubmit={handleVerify} className="space-y-6">
-          
           {/* Inputs */}
           {isUsingBackupCode ? (
             <div className="flex justify-center">
@@ -159,20 +173,26 @@ const Login2FAPage: React.FC = () => {
                 disabled={isLoading || timeLeft === 0}
                 placeholder="Enter 8-character code"
                 className={`w-full h-12 text-center text-xl font-bold tracking-widest rounded-lg border outline-none transition-all uppercase
-                  ${error 
-                    ? "border-red-500 bg-red-50 text-red-600 focus:ring-2 focus:ring-red-200" 
-                    : "border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900"
+                  ${
+                    error
+                      ? "border-red-500 bg-red-50 text-red-600 focus:ring-2 focus:ring-red-200"
+                      : "border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900"
                   }
                 `}
               />
             </div>
           ) : (
-            <div className="flex justify-center gap-2 sm:gap-3" onPaste={handlePaste}>
+            <div
+              className="flex justify-center gap-2 sm:gap-3"
+              onPaste={handlePaste}
+            >
               {verificationCode.map((digit, index) => (
                 <input
                   key={index}
-                  ref={(el) => { inputRefs.current[index] = el; }}
-                  type="text" 
+                  ref={(el) => {
+                    inputRefs.current[index] = el;
+                  }}
+                  type="text"
                   inputMode="numeric"
                   maxLength={1}
                   value={digit}
@@ -183,9 +203,10 @@ const Login2FAPage: React.FC = () => {
                     w-10 h-10 sm:w-12 sm:h-12 
                     text-center text-xl font-bold 
                     rounded-lg border outline-none transition-all
-                    ${error 
-                      ? "border-red-500 bg-red-50 text-red-600 focus:ring-2 focus:ring-red-200" 
-                      : "border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900"
+                    ${
+                      error
+                        ? "border-red-500 bg-red-50 text-red-600 focus:ring-2 focus:ring-red-200"
+                        : "border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900"
                     }
                   `}
                 />
@@ -198,10 +219,14 @@ const Login2FAPage: React.FC = () => {
             {error ? (
               <span className="text-red-600 font-medium">{error}</span>
             ) : (
-              <span className="text-gray-500 dark:text-gray-400">Time remaining:</span>
+              <span className="text-gray-500 dark:text-gray-400">
+                Time remaining:
+              </span>
             )}
-            
-            <span className={`font-mono font-bold ${timeLeft < 60 ? "text-red-500" : "text-blue-600 dark:text-blue-400"}`}>
+
+            <span
+              className={`font-mono font-bold ${timeLeft < 60 ? "text-red-500" : "text-blue-600 dark:text-blue-400"}`}
+            >
               {timeLeft > 0 ? formatTime(timeLeft) : "Expired"}
             </span>
           </div>
@@ -242,7 +267,6 @@ const Login2FAPage: React.FC = () => {
             {isUsingBackupCode ? "Use Authenticator App" : "Use Backup Code"}
           </button>
         </p>
-
       </div>
     </div>
   );

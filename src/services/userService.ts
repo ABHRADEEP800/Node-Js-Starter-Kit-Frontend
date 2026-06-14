@@ -61,9 +61,7 @@ class UserService {
     }
   }
 
-  async verifyLogin2FA(
-  code: string
-  ): Promise<ApiResponse<{ user: User }>> {
+  async verifyLogin2FA(code: string): Promise<ApiResponse<{ user: User }>> {
     const response = await apiClient("/user/2fa/verify", {
       method: "POST",
       body: JSON.stringify({ code }),
@@ -177,6 +175,66 @@ class UserService {
     const data = await response.json();
     if (!response.ok) throw new ApiError(data.message);
     return data;
+  }
+
+  async forgotPassword(
+    email: string,
+    recaptchaToken: string
+  ): Promise<ApiResponse<null>> {
+    const response = await apiClient("/user/forgot-password", {
+      method: "POST",
+      body: JSON.stringify({ email, recaptchaToken }),
+    });
+    const data = await response.json();
+    if (!response.ok)
+      throw new ApiError(data.message || "Failed to submit request");
+    return data;
+  }
+
+  async resetPassword(
+    token: string,
+    password: string
+  ): Promise<ApiResponse<null>> {
+    const response = await apiClient("/user/reset-password", {
+      method: "POST",
+      body: JSON.stringify({ token, password }),
+    });
+    const data = await response.json();
+    if (!response.ok)
+      throw new ApiError(data.message || "Failed to reset password");
+    return data;
+  }
+
+  async checkUsernameAvailability(
+    username: string
+  ): Promise<{ available: boolean; message: string }> {
+    const response = await apiClient(
+      `/user/check-username?username=${encodeURIComponent(username)}`,
+      {
+        method: "GET",
+      }
+    );
+    const data = await response.json();
+    return {
+      available: data.data?.available ?? false,
+      message: data.message || "",
+    };
+  }
+
+  async checkEmailAvailability(
+    email: string
+  ): Promise<{ available: boolean; message: string }> {
+    const response = await apiClient(
+      `/user/check-email?email=${encodeURIComponent(email)}`,
+      {
+        method: "GET",
+      }
+    );
+    const data = await response.json();
+    return {
+      available: data.data?.available ?? false,
+      message: data.message || "",
+    };
   }
 }
 

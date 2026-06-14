@@ -67,19 +67,32 @@ export const apiClient = async (
     const response = await fetch(getUrl(endpoint), config);
 
     // 3. 🚨 THE INTERCEPTOR LOGIC 🚨
+    // A. Update CSRF token if rotated in the backend response
+    try {
+      const clone = response.clone();
+      const contentType = clone.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const body = await clone.json();
+        const newToken = body?.csrfToken || body?.data?.csrfToken;
+        if (newToken) {
+          cachedCsrfToken = newToken;
+        }
+      }
+    } catch (e) {
+      // Ignore clone/json parsing errors
+    }
+
     // If Backend says "401 Unauthorized" (Token expired/invalid)
     if (response.status === 401) {
-      
       // Check if we are already logged out to prevent infinite loops
       const state = store.getState();
       if (state.auth.status) {
-        
         // A. Dispatch Logout Action immediately
         store.dispatch(logout());
 
         // B. Optional: Redirect manually if your Router doesn't catch the state change fast enough
-        // window.location.href = "/signin"; 
-        
+        // window.location.href = "/signin";
+
         // C. Throw specific error so the calling component knows to stop
         throw new Error("Session expired. Please login again.");
       }

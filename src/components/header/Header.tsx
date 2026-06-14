@@ -36,7 +36,7 @@ function Header() {
   // Navigation items for non-authenticated users
   // Added 'end: true' to Home so it doesn't highlight on every page
   const publicNavItems = [
-    { name: "Home", url: "/", auth: true, end: true }, 
+    { name: "Home", url: "/", auth: true, end: true },
     { name: "Features", url: "#features", auth: true },
     { name: "About", url: "#about", auth: true },
   ];
@@ -46,7 +46,7 @@ function Header() {
   const privateNavItems = [
     { name: "Dashboard", url: "/dashboard", auth: status, end: true },
   ];
-  
+
   const adminNavItems = [
     { name: "Dashboard", url: "/admin-dashboard", auth: status, end: true },
     // Example: If you add Users later, you can leave end: false to keep it active on sub-pages
@@ -159,12 +159,14 @@ function Header() {
                             key={item.name}
                             to={item.url}
                             end={item.end} // Use the 'end' prop here
-                            className={({ isActive }) => classNames(
-                              "text-sm font-semibold px-3 py-2 rounded-md transition-colors",
-                              isActive
-                                ? "text-blue-600 bg-blue-50 dark:bg-blue-900/20"
-                                : "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
-                            )}
+                            className={({ isActive }) =>
+                              classNames(
+                                "text-sm font-semibold px-3 py-2 rounded-md transition-colors",
+                                isActive
+                                  ? "text-blue-600 bg-blue-50 dark:bg-blue-900/20"
+                                  : "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
+                              )
+                            }
                           >
                             {item.name}
                           </NavLink>
@@ -177,7 +179,9 @@ function Header() {
                           <div key={item.name}>
                             {item.url.startsWith("#") ? (
                               <button
-                                onClick={() => handleAnchorClick(item.url, close)}
+                                onClick={() =>
+                                  handleAnchorClick(item.url, close)
+                                }
                                 className="text-sm font-semibold px-3 py-2 rounded-md transition-colors text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
                               >
                                 {item.name}
@@ -186,12 +190,14 @@ function Header() {
                               <NavLink
                                 to={item.url}
                                 end={item.end} // Use the 'end' prop here
-                                className={({ isActive }) => classNames(
-                                  "text-sm font-semibold px-3 py-2 rounded-md transition-colors",
-                                  isActive
-                                    ? "text-blue-600 bg-blue-50 dark:bg-blue-900/20"
-                                    : "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
-                                )}
+                                className={({ isActive }) =>
+                                  classNames(
+                                    "text-sm font-semibold px-3 py-2 rounded-md transition-colors",
+                                    isActive
+                                      ? "text-blue-600 bg-blue-50 dark:bg-blue-900/20"
+                                      : "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
+                                  )
+                                }
                               >
                                 {item.name}
                               </NavLink>
@@ -247,12 +253,14 @@ function Header() {
                         key={item.name}
                         to={item.url}
                         end={item.end} // Use the 'end' prop here
-                        className={({ isActive }) => classNames(
-                          "block text-sm font-medium py-2 px-3 rounded-md",
-                          isActive
-                            ? "text-blue-600 bg-blue-50 dark:bg-blue-900/20"
-                            : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-                        )}
+                        className={({ isActive }) =>
+                          classNames(
+                            "block text-sm font-medium py-2 px-3 rounded-md",
+                            isActive
+                              ? "text-blue-600 bg-blue-50 dark:bg-blue-900/20"
+                              : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+                          )
+                        }
                       >
                         {item.name}
                       </NavLink>
@@ -275,12 +283,14 @@ function Header() {
                             onClick={close}
                             to={item.url}
                             end={item.end} // Use the 'end' prop here
-                            className={({ isActive }) => classNames(
-                              "block text-sm font-medium py-2 px-3 rounded-md",
-                              isActive
-                                ? "text-blue-600 bg-blue-50 dark:bg-blue-900/20"
-                                : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-                            )}
+                            className={({ isActive }) =>
+                              classNames(
+                                "block text-sm font-medium py-2 px-3 rounded-md",
+                                isActive
+                                  ? "text-blue-600 bg-blue-50 dark:bg-blue-900/20"
+                                  : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+                              )
+                            }
                           >
                             {item.name}
                           </NavLink>

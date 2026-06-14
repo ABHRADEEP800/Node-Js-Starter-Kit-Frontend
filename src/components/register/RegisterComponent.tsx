@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Button, Input } from "../";
 import { useForm } from "react-hook-form";
 import UserService from "../../services/userService";
@@ -18,8 +19,113 @@ function RegisterComponent() {
   } = useForm<UserSignup>();
 
   const password = watch("password");
+  const usernameVal = watch("username");
+  const emailVal = watch("email");
+
+  const [usernameStatus, setUsernameStatus] = useState<{
+    checking: boolean;
+    available: boolean | null;
+    message: string;
+  }>({ checking: false, available: null, message: "" });
+
+  const [emailStatus, setEmailStatus] = useState<{
+    checking: boolean;
+    available: boolean | null;
+    message: string;
+  }>({ checking: false, available: null, message: "" });
+
+  // Debounced check for username availability
+  useEffect(() => {
+    if (!usernameVal || usernameVal.length < 3) {
+      setUsernameStatus({ checking: false, available: null, message: "" });
+      return;
+    }
+
+    const usernameRegex = /^[a-zA-Z0-9_]+$/;
+    if (!usernameRegex.test(usernameVal)) {
+      setUsernameStatus({
+        checking: false,
+        available: false,
+        message: "Invalid characters (use alphanumeric & _)",
+      });
+      return;
+    }
+
+    setUsernameStatus({ checking: true, available: null, message: "" });
+
+    const handler = setTimeout(async () => {
+      try {
+        const res = await UserService.checkUsernameAvailability(usernameVal);
+        setUsernameStatus({
+          checking: false,
+          available: res.available,
+          message: res.message,
+        });
+      } catch (error: any) {
+        setUsernameStatus({
+          checking: false,
+          available: null,
+          message: "Check failed",
+        });
+      }
+    }, 400);
+
+    return () => clearTimeout(handler);
+  }, [usernameVal]);
+
+  // Debounced check for email availability
+  useEffect(() => {
+    if (!emailVal) {
+      setEmailStatus({ checking: false, available: null, message: "" });
+      return;
+    }
+
+    const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+    if (!emailRegex.test(emailVal)) {
+      setEmailStatus({ checking: false, available: null, message: "" });
+      return;
+    }
+
+    setEmailStatus({ checking: true, available: null, message: "" });
+
+    const handler = setTimeout(async () => {
+      try {
+        const res = await UserService.checkEmailAvailability(emailVal);
+        setEmailStatus({
+          checking: false,
+          available: res.available,
+          message: res.message,
+        });
+      } catch (error: any) {
+        setEmailStatus({
+          checking: false,
+          available: null,
+          message: "Check failed",
+        });
+      }
+    }, 400);
+
+    return () => clearTimeout(handler);
+  }, [emailVal]);
 
   const userSignup = async (data: UserSignup): Promise<void> => {
+    if (usernameStatus.available === false) {
+      toast.error("Please select an available username");
+      return;
+    }
+
+    if (emailStatus.available === false) {
+      toast.error("Please enter an unregistered email address");
+      return;
+    }
+
+    if (usernameStatus.checking || emailStatus.checking) {
+      toast.info(
+        "Please wait for username/email availability checks to complete"
+      );
+      return;
+    }
+
     if (!executeRecaptcha) {
       toast.error("reCAPTCHA not yet available");
       return;
@@ -30,7 +136,7 @@ function RegisterComponent() {
     UserService.userSignup({ ...data, recaptchaToken: token })
       .then((res) => {
         navigate("/signin");
-        toast.success(res.message, { autoClose: 10000 }); // Give them time to read the email instruction
+        toast.success(res.message, { autoClose: 10000 }); // Give them time to read email instructions
       })
       .catch((err) => toast.error(err.message));
   };
@@ -54,7 +160,19 @@ function RegisterComponent() {
           {/* Username */}
           <Input
             label="Username"
-            error={errors.username?.message}
+            error={
+              errors.username?.message ||
+              (usernameStatus.available === false
+                ? usernameStatus.message
+                : undefined)
+            }
+            message={
+              usernameStatus.checking
+                ? "Checking..."
+                : usernameStatus.available === true
+                  ? "✓ Available"
+                  : undefined
+            }
             placeholder="e.g. johndoe"
             {...register("username", { required: "Username is required" })}
           />
@@ -63,7 +181,19 @@ function RegisterComponent() {
           <Input
             label="Email"
             placeholder="e.g. example@domain.com"
-            error={errors.email?.message}
+            error={
+              errors.email?.message ||
+              (emailStatus.available === false
+                ? emailStatus.message
+                : undefined)
+            }
+            message={
+              emailStatus.checking
+                ? "Checking..."
+                : emailStatus.available === true
+                  ? "✓ Available"
+                  : undefined
+            }
             {...register("email", {
               required: "Email is required",
               validate: (value) =>
