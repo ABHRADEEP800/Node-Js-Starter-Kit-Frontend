@@ -46,7 +46,7 @@ function ForgotPasswordContent() {
 
   if (submittedEmail) {
     return (
-      <div className="flex justify-center items-center px-4 bg-gray-50 dark:bg-gray-900 pt-2 min-h-[70vh]">
+      <div className="flex justify-center items-center px-4 bg-gray-50 dark:bg-gray-900 min-h-[calc(100vh-4rem)] py-12">
         <div className="w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 text-center animate-fade-in">
           <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 mb-6">
             <svg
@@ -108,7 +108,7 @@ function ForgotPasswordContent() {
   }
 
   return (
-    <div className="flex justify-center items-center px-4 bg-gray-50 dark:bg-gray-900 pt-2 min-h-[70vh]">
+    <div className="flex justify-center items-center px-4 bg-gray-50 dark:bg-gray-900 min-h-[calc(100vh-4rem)] py-12">
       <div className="w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-2xl">
         <h1 className="text-3xl font-extrabold text-center mb-2 text-gray-900 dark:text-white">
           Forgot Password

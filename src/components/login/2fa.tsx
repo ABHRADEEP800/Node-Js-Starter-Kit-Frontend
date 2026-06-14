@@ -143,14 +143,14 @@ const Login2FAPage: React.FC = () => {
 
   if (isCheckingSession) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="flex justify-center items-center min-h-[calc(100vh-4rem)] py-12 bg-gray-50 dark:bg-gray-900">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="flex justify-center items-center px-4 bg-gray-50 dark:bg-gray-900 min-h-screen pt-2">
+    <div className="flex justify-center items-center px-4 bg-gray-50 dark:bg-gray-900 min-h-[calc(100vh-4rem)] py-12">
       {/* Container matching LoginComponent */}
       <div className="w-full max-w-md bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-center mb-2 text-gray-900 dark:text-white">
