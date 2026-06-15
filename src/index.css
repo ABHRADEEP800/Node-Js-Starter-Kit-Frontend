@@ -71,3 +71,17 @@ input[type="number"] {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* Custom keyframes and utility for enterprise loading bar */
+@keyframes loading-bar {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@utility animate-loading-bar {
+  animation: loading-bar 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
