@@ -110,7 +110,7 @@ function Header() {
                     alt={import.meta.env.VITE_PROJECT_NAME}
                     className="h-7 w-7 mr-2"
                   />
-                  <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  <span className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 hidden min-[400px]:inline">
                     {import.meta.env.VITE_PROJECT_NAME}
                   </span>
                 </Link>
@@ -125,23 +125,23 @@ function Header() {
                     role={loggedInUser?.role || "user"}
                   />
                 ) : (
-                  <>
+                  <div className="flex items-center gap-1.5 ms-1">
                     {location.pathname === "/signin" ? (
                       <Link
                         to="/signup"
-                        className="px-4 py-2 rounded-md bg-blue-600 text-white text-sm font-semibold shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors"
+                        className="px-2.5 py-1.5 rounded-md bg-blue-600 text-white text-xs font-semibold shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors"
                       >
                         Sign Up
                       </Link>
                     ) : (
                       <Link
                         to="/signin"
-                        className="px-4 py-2 rounded-md bg-blue-600 text-white text-sm font-semibold shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors"
+                        className="px-2.5 py-1.5 rounded-md bg-blue-600 text-white text-xs font-semibold shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors"
                       >
                         Log In
                       </Link>
                     )}
-                  </>
+                  </div>
                 )}
               </div>
 

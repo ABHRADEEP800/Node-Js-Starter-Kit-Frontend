@@ -22,9 +22,9 @@ export default function ThemeToggler() {
   }, [themeMode, dispatch]);
 
   return (
-    <div className="ms-4 flex justify-center items-center ">
+    <div className="ms-1 sm:ms-4 flex justify-center items-center">
       <button
-        className="mx-3 cursor-pointer p-0.5 "
+        className="mx-1 sm:mx-3 cursor-pointer p-0.5"
         onClick={() => {
           themeChangeHandle(themeMode === "light");
         }}

@@ -121,8 +121,13 @@ const Profile = () => {
     e.preventDefault();
     if (passForm.new !== passForm.confirm)
       return toast.error("New passwords do not match");
-    if (passForm.new.length < 6)
-      return toast.error("Password must be at least 6 characters");
+
+    const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
+    if (!passwordRegex.test(passForm.new)) {
+      return toast.error(
+        "Password must contain at least 8 characters, a number, uppercase & lowercase letter"
+      );
+    }
 
     try {
       const res = await userService.changePassword(
@@ -256,7 +261,7 @@ const Profile = () => {
 
                   {/* Password Button */}
                   <div className="border-t border-gray-100 dark:border-gray-700 pt-6">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                       <div>
                         <p className="text-sm font-medium text-gray-900 dark:text-white uppercase tracking-wider">
                           Password
@@ -264,7 +269,7 @@ const Profile = () => {
                       </div>
                       <button
                         onClick={() => setShowPasswordModal(true)}
-                        className="flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm"
+                        className="flex items-center justify-center w-full sm:w-auto px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm cursor-pointer"
                       >
                         <KeyIcon className="w-4 h-4 mr-2 text-gray-500" />
                         Change Password

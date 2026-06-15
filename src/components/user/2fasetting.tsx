@@ -69,6 +69,8 @@ const TwoFASettingsPage = () => {
   const [loadingSessions, setLoadingSessions] = useState(true);
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const generatingRef = useRef(false);
+  const loading2FARef = useRef(false);
 
   // --- Initial Data Fetching ---
   useEffect(() => {
@@ -99,6 +101,8 @@ const TwoFASettingsPage = () => {
   };
 
   const handleGenerate2FA = async () => {
+    if (generatingRef.current) return;
+    generatingRef.current = true;
     try {
       setIsGenerating(true);
       setError(null);
@@ -112,6 +116,7 @@ const TwoFASettingsPage = () => {
       setError(error?.message || "Failed to generate 2FA secret");
     } finally {
       setIsGenerating(false);
+      generatingRef.current = false;
     }
   };
 
@@ -148,6 +153,7 @@ const TwoFASettingsPage = () => {
 
   const handleEnable2FA = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading2FARef.current) return;
     const code = verificationCode.join("");
     if (code.length !== 6) {
       setError("Please enter the complete 6-digit code");
@@ -155,8 +161,9 @@ const TwoFASettingsPage = () => {
     }
     try {
       setIs2FALoading(true);
+      loading2FARef.current = true;
       setError(null);
-      const response = await userService.change2FAStatus(code);
+      const response = await userService.change2FAStatus(code, true);
       if (response.success) {
         setTwoFAStatus({ enabled: true, verified: true });
         setStep("status");
@@ -170,11 +177,13 @@ const TwoFASettingsPage = () => {
       inputRefs.current[0]?.focus();
     } finally {
       setIs2FALoading(false);
+      loading2FARef.current = false;
     }
   };
 
   const handleDisable2FA = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading2FARef.current) return;
     const code = verificationCode.join("");
     if (code.length !== 6) {
       setError("Please enter the complete 6-digit code");
@@ -182,8 +191,9 @@ const TwoFASettingsPage = () => {
     }
     try {
       setIs2FALoading(true);
+      loading2FARef.current = true;
       setError(null);
-      const response = await userService.change2FAStatus(code);
+      const response = await userService.change2FAStatus(code, false);
       if (response.success) {
         setTwoFAStatus({ enabled: false, verified: false });
         setStep("status");
@@ -194,6 +204,7 @@ const TwoFASettingsPage = () => {
       setError(error?.message || "Failed to disable 2FA");
     } finally {
       setIs2FALoading(false);
+      loading2FARef.current = false;
     }
   };
 
@@ -318,7 +329,7 @@ const TwoFASettingsPage = () => {
         {/* ======================= */}
         {/* 1. 2FA SECTION          */}
         {/* ======================= */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 sm:p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-5 sm:p-8">
           {/* Status View */}
           {step === "status" && (
             <div className="space-y-6">
@@ -514,7 +525,7 @@ const TwoFASettingsPage = () => {
               >
                 <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-6 border border-gray-200 dark:border-gray-600">
                   <div
-                    className="flex gap-2 justify-center mb-6"
+                    className="flex gap-1.5 min-[380px]:gap-2 sm:gap-3 justify-center mb-6"
                     onPaste={handlePaste}
                   >
                     {verificationCode.map((digit, index) => (
@@ -524,13 +535,14 @@ const TwoFASettingsPage = () => {
                           inputRefs.current[index] = el;
                         }}
                         type="text"
+                        inputMode="numeric"
                         maxLength={1}
                         value={digit}
                         onChange={(e) =>
                           handleDigitChange(index, e.target.value)
                         }
                         onKeyDown={(e) => handleKeyDown(index, e)}
-                        className="w-10 h-10 sm:w-12 sm:h-12 text-center text-xl font-bold border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 dark:text-white"
+                        className="w-9 h-9 min-[380px]:w-10 min-[380px]:h-10 sm:w-12 sm:h-12 text-center text-lg sm:text-xl font-bold border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 dark:text-white"
                         disabled={is2FALoading}
                       />
                     ))}
@@ -560,7 +572,7 @@ const TwoFASettingsPage = () => {
         {/* ======================= */}
         {/* 2. SESSIONS SECTION     */}
         {/* ======================= */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 sm:p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-5 sm:p-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
             <div>
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">

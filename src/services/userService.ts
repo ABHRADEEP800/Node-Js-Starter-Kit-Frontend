@@ -143,11 +143,12 @@ class UserService {
   }
 
   async change2FAStatus(
-    code: string
+    code: string,
+    enable?: boolean
   ): Promise<ApiResponse<{ twofaEnabled: boolean }>> {
     const response = await apiClient("/user/2fa/change", {
       method: "POST",
-      body: JSON.stringify({ code }),
+      body: JSON.stringify({ code, enable }),
     });
     const data = await response.json();
     if (!response.ok) throw new ApiError(data.message);

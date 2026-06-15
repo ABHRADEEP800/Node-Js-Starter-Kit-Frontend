@@ -40,7 +40,7 @@ const VerifyEmail: React.FC = () => {
 
   return (
     <div className="flex justify-center items-center min-h-[calc(100vh-4rem)] py-12 bg-gray-50 dark:bg-gray-900">
-      <div className="w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 text-center">
+      <div className="w-full max-w-md bg-white dark:bg-gray-800 p-5 sm:p-8 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 text-center">
         <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
           Email Verification
         </h1>
