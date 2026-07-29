@@ -41,14 +41,20 @@
     "@vite-pwa/assets-generator": "^1.0.0",
     "@vitejs/plugin-react": "^5.0.0",
     "baseline-browser-mapping": "^2.9.11",
-    "eslint": "^9.33.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.20",
+    "eslint": "^10.8.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
     "globals": "^16.3.0",
     "prettier": "^3.6.2",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.39.1",
-    "vite": "^8.0.16",
+    "vite": "^8.1.5",
     "vite-plugin-pwa": "^1.1.0"
+  },
+  "overrides": {
+    "sharp": "0.35.3",
+    "react-router": "8.3.0",
+    "brace-expansion": "5.0.8",
+    "@trickfilm400/rollup-plugin-off-main-thread": "4.0.0-pre2"
   }
 }
