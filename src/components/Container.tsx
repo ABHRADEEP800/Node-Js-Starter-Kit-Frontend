@@ -2,7 +2,7 @@ import type { JSX } from "react";
 
 function Container({ children }: { children: React.ReactNode }): JSX.Element {
   return (
-    <div className="w-full min-h-screen mx-auto p-2 bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 transition-colors duration-300 dark:bg-gray-950">
       {children}
     </div>
   );

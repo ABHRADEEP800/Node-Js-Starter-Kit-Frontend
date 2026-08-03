@@ -52,7 +52,7 @@ const BackToTop = () => {
             transform hover:scale-105 active:scale-95
             focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none
             transition-all duration-300 
-            backdrop-blur-sm bg-opacity-90
+            backdrop-blur-sm
             touch-manipulation
             group
             ${

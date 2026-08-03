@@ -3,6 +3,7 @@ import Input from "./Input";
 import Loading from "./Loading";
 import AuthLayout from "./AuthLayout";
 import Container from "./Container";
+import Footer from "./Footer";
 import LoginComponent from "./login/LoginComponent";
 import Header from "./header/Header";
 import HomeComponent from "./home/HomeComponent";
@@ -16,6 +17,7 @@ export {
   Header,
   AuthLayout,
   Container,
+  Footer,
   LoginComponent,
   DashboardComponent,
 };

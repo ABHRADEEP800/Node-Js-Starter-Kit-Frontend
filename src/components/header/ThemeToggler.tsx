@@ -1,6 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
 import { MoonIcon, SunIcon } from "@heroicons/react/24/outline";
-import { useEffect } from "react";
 import { setTheme } from "../../store/theme/themeSlice";
 
 export default function ThemeToggler() {
@@ -10,37 +9,24 @@ export default function ThemeToggler() {
 
   const dispatch = useDispatch();
 
-  const themeChangeHandle = (isLight: boolean) => {
-    if (isLight) {
-      dispatch(setTheme("dark"));
-    } else {
-      dispatch(setTheme("light"));
-    }
+  const isDark = themeMode === "dark";
+
+  const toggleTheme = () => {
+    dispatch(setTheme(isDark ? "light" : "dark"));
   };
-  useEffect(() => {
-    dispatch(setTheme(themeMode));
-  }, [themeMode, dispatch]);
 
   return (
-    <div className="ms-1 sm:ms-4 flex justify-center items-center">
-      <button
-        className="mx-1 sm:mx-3 cursor-pointer p-0.5"
-        onClick={() => {
-          themeChangeHandle(themeMode === "light");
-        }}
-      >
-        {themeMode === "dark" ? (
-          <SunIcon
-            className="h-6 w-6  dark:text-gray-100  hover:text-colorbs"
-            title="Lightmode"
-          />
-        ) : (
-          <MoonIcon
-            className="h-5 w-5 text-colorWhite dark:text-gray-100 hover:text-colorbs"
-            title="Darkmode"
-          />
-        )}
-      </button>
-    </div>
+    <button
+      onClick={toggleTheme}
+      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-2 focus-visible:outline-brand-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
+    >
+      {isDark ? (
+        <SunIcon className="h-5 w-5" />
+      ) : (
+        <MoonIcon className="h-5 w-5" />
+      )}
+    </button>
   );
 }

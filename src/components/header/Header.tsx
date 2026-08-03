@@ -11,8 +11,34 @@ import type { AuthState } from "../../store/auth/authSlice";
 import ThemeToggler from "./ThemeToggler";
 import { useState, useEffect } from "react";
 
-function classNames(...classes: string[]) {
+function classNames(...classes: (string | boolean | undefined)[]) {
   return classes.filter(Boolean).join(" ");
+}
+
+const projectName = import.meta.env.VITE_PROJECT_NAME as string;
+
+function LogoMark({ className = "h-7 w-7" }: { className?: string }) {
+  return (
+    <span
+      className={`flex shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500 to-indigo-600 text-white shadow-sm shadow-brand-500/30 ${className}`}
+    >
+      <svg viewBox="0 0 24 24" fill="none" className="h-[60%] w-[60%]">
+        <path
+          d="M12 2.5 20 6v5.5c0 4.5-3.4 7.9-8 10-4.6-2.1-8-5.5-8-10V6l8-3.5Z"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinejoin="round"
+        />
+        <path
+          d="m8.5 12 2.4 2.4 4.6-4.8"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </span>
+  );
 }
 
 function Header() {
@@ -29,12 +55,12 @@ function Header() {
       setIsScrolled(window.scrollY > 10);
     };
 
+    handleScroll();
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   // Navigation items for non-authenticated users
-  // Added 'end: true' to Home so it doesn't highlight on every page
   const publicNavItems = [
     { name: "Home", url: "/", auth: true, end: true },
     { name: "Features", url: "#features", auth: true },
@@ -42,15 +68,12 @@ function Header() {
   ];
 
   // Navigation items for authenticated users
-  // Added 'end: true' to Dashboards so they don't highlight when on sub-pages (e.g. Users)
   const privateNavItems = [
     { name: "Dashboard", url: "/dashboard", auth: status, end: true },
   ];
 
   const adminNavItems = [
     { name: "Dashboard", url: "/admin-dashboard", auth: status, end: true },
-    // Example: If you add Users later, you can leave end: false to keep it active on sub-pages
-    // { name: "Users", url: "/admin-dashboard/users", auth: status, end: false },
   ];
 
   // Function to handle anchor link clicks
@@ -68,23 +91,71 @@ function Header() {
     }
   };
 
+  const navItems = status
+    ? loggedInUser?.role === "admin"
+      ? adminNavItems
+      : privateNavItems
+    : publicNavItems;
+
+  const renderLink = (
+    item: { name: string; url: string; end?: boolean; auth?: boolean },
+    close: () => void,
+    mobile = false
+  ) => {
+    const baseClasses = classNames(
+      mobile ? "block py-2.5 px-3 rounded-lg" : "px-3 py-2 rounded-lg",
+      "text-sm font-medium transition-colors"
+    );
+    const activeClasses =
+      "text-brand-600 bg-brand-50 dark:bg-brand-950/50 dark:text-brand-400";
+    const idleClasses =
+      "text-gray-700 dark:text-gray-300 hover:text-brand-600 hover:bg-gray-100/70 dark:hover:text-brand-400 dark:hover:bg-gray-800/70";
+
+    if (item.url.startsWith("#")) {
+      return (
+        <button
+          key={item.name}
+          onClick={() => handleAnchorClick(item.url, close)}
+          className={classNames(baseClasses, idleClasses, mobile && "w-full text-left")}
+        >
+          {item.name}
+        </button>
+      );
+    }
+
+    return (
+      <NavLink
+        key={item.name}
+        to={item.url}
+        end={item.end}
+        onClick={mobile ? close : undefined}
+        className={({ isActive }) =>
+          classNames(baseClasses, isActive ? activeClasses : idleClasses)
+        }
+      >
+        {item.name}
+      </NavLink>
+    );
+  };
+
   return (
     <Disclosure
       as="nav"
-      className={`sticky top-0 z-50 transition-all duration-300 ${
+      className={classNames(
+        "sticky top-0 z-50 border-b transition-all duration-300",
         isScrolled
-          ? "bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm"
-          : "bg-white dark:bg-gray-900 border-b border-transparent"
-      }`}
+          ? "border-gray-200 bg-white/85 shadow-sm backdrop-blur-xl dark:border-gray-800 dark:bg-gray-950/85"
+          : "border-transparent bg-white dark:bg-gray-950"
+      )}
     >
       {({ open, close }: { open: boolean; close: () => void }) => (
         <>
-          {/* HEADER */}
-          <div className="mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center h-16">
-              {/* Left - Mobile Menu Toggle */}
-              <div className="flex items-center md:hidden">
-                <DisclosureButton className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none">
+          <div className="mx-auto h-16 max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex h-full items-center justify-between gap-3">
+              {/* Left: mobile menu button */}
+              <div className="flex items-center lg:hidden">
+                <DisclosureButton className="inline-flex items-center justify-center rounded-lg p-2 text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800 focus-visible:outline-2 focus-visible:outline-brand-600">
+                  <span className="sr-only">Open main menu</span>
                   {open ? (
                     <XMarkIcon className="h-6 w-6" />
                   ) : (
@@ -93,8 +164,8 @@ function Header() {
                 </DisclosureButton>
               </div>
 
-              {/* Center - Logo */}
-              <div className="flex justify-center md:justify-start flex-1 md:flex-none">
+              {/* Logo */}
+              <div className="flex flex-1 items-center lg:flex-none">
                 <Link
                   to={
                     status
@@ -103,21 +174,22 @@ function Header() {
                         : "/dashboard"
                       : "/"
                   }
-                  className="flex items-center"
+                  className="flex items-center gap-2.5"
                 >
-                  <img
-                    src="/NovaShield.svg"
-                    alt={import.meta.env.VITE_PROJECT_NAME}
-                    className="h-7 w-7 mr-2"
-                  />
-                  <span className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 hidden min-[400px]:inline">
-                    {import.meta.env.VITE_PROJECT_NAME}
+                  <LogoMark />
+                  <span className="hidden text-base font-bold tracking-tight text-gray-900 sm:inline dark:text-white">
+                    {projectName}
                   </span>
                 </Link>
               </div>
 
-              {/* Right - UserMenu / Login */}
-              <div className="flex items-center md:hidden">
+              {/* Desktop nav */}
+              <div className="hidden items-center gap-1 lg:flex">
+                {navItems.map((item) => renderLink(item, close))}
+              </div>
+
+              {/* Right actions */}
+              <div className="flex flex-1 items-center justify-end gap-1 lg:flex-none">
                 <ThemeToggler />
                 {status ? (
                   <UserMenu
@@ -125,179 +197,58 @@ function Header() {
                     role={loggedInUser?.role || "user"}
                   />
                 ) : (
-                  <div className="flex items-center gap-1.5 ms-1">
-                    {location.pathname === "/signin" ? (
-                      <Link
-                        to="/signup"
-                        className="px-2.5 py-1.5 rounded-md bg-blue-600 text-white text-xs font-semibold shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors"
-                      >
-                        Sign Up
-                      </Link>
-                    ) : (
-                      <Link
-                        to="/signin"
-                        className="px-2.5 py-1.5 rounded-md bg-blue-600 text-white text-xs font-semibold shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors"
-                      >
-                        Log In
-                      </Link>
-                    )}
+                  <div className="flex items-center gap-2 ms-1">
+                    <Link
+                      to="/signin"
+                      className={classNames(
+                        "rounded-lg px-4 py-2 text-sm font-semibold transition-all",
+                        location.pathname === "/signin"
+                          ? "hidden"
+                          : "text-gray-700 hover:text-brand-600 dark:text-gray-200 dark:hover:text-brand-400"
+                      )}
+                    >
+                      Log in
+                    </Link>
+                    <Link
+                      to="/signup"
+                      className={classNames(
+                        "rounded-lg px-4 py-2 text-sm font-semibold shadow-sm transition-all active:scale-[0.98]",
+                        location.pathname === "/signup"
+                          ? "hidden"
+                          : "bg-brand-600 text-white shadow-brand-600/25 hover:bg-brand-700"
+                      )}
+                    >
+                      Sign up
+                    </Link>
                   </div>
-                )}
-              </div>
-
-              {/* Desktop Navigation */}
-              <div className="hidden md:flex md:items-center md:space-x-6">
-                {status
-                  ? // Authenticated user navigation
-                    (loggedInUser?.role === "admin"
-                      ? adminNavItems
-                      : privateNavItems
-                    ).map(
-                      (item) =>
-                        item.auth && (
-                          <NavLink
-                            key={item.name}
-                            to={item.url}
-                            end={item.end} // Use the 'end' prop here
-                            className={({ isActive }) =>
-                              classNames(
-                                "text-sm font-semibold px-3 py-2 rounded-md transition-colors",
-                                isActive
-                                  ? "text-blue-600 bg-blue-50 dark:bg-blue-900/20"
-                                  : "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
-                              )
-                            }
-                          >
-                            {item.name}
-                          </NavLink>
-                        )
-                    )
-                  : // Public navigation
-                    publicNavItems.map(
-                      (item) =>
-                        item.auth && (
-                          <div key={item.name}>
-                            {item.url.startsWith("#") ? (
-                              <button
-                                onClick={() =>
-                                  handleAnchorClick(item.url, close)
-                                }
-                                className="text-sm font-semibold px-3 py-2 rounded-md transition-colors text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
-                              >
-                                {item.name}
-                              </button>
-                            ) : (
-                              <NavLink
-                                to={item.url}
-                                end={item.end} // Use the 'end' prop here
-                                className={({ isActive }) =>
-                                  classNames(
-                                    "text-sm font-semibold px-3 py-2 rounded-md transition-colors",
-                                    isActive
-                                      ? "text-blue-600 bg-blue-50 dark:bg-blue-900/20"
-                                      : "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
-                                  )
-                                }
-                              >
-                                {item.name}
-                              </NavLink>
-                            )}
-                          </div>
-                        )
-                    )}
-              </div>
-
-              {/* Desktop Right */}
-              <div className="hidden md:flex md:items-center md:space-x-4">
-                <ThemeToggler />
-                {status ? (
-                  <UserMenu
-                    userName={loggedInUser?.username}
-                    role={loggedInUser?.role || "user"}
-                  />
-                ) : (
-                  <>
-                    {location.pathname === "/signin" ? (
-                      <Link
-                        to="/signup"
-                        className="px-4 py-2 rounded-md bg-blue-600 text-white text-sm font-semibold shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors"
-                      >
-                        Sign Up
-                      </Link>
-                    ) : (
-                      <Link
-                        to="/signin"
-                        className="px-4 py-2 rounded-md bg-blue-600 text-white text-sm font-semibold shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors"
-                      >
-                        Log In
-                      </Link>
-                    )}
-                  </>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Mobile Nav Panel */}
-          <DisclosurePanel className="md:hidden absolute top-16 left-0 w-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-md z-50 shadow-md px-4 pb-3 space-y-1">
-            {status
-              ? // Authenticated user mobile navigation
-                (loggedInUser?.role === "admin"
-                  ? adminNavItems
-                  : privateNavItems
-                ).map(
-                  (item) =>
-                    item.auth && (
-                      <NavLink
-                        onClick={close}
-                        key={item.name}
-                        to={item.url}
-                        end={item.end} // Use the 'end' prop here
-                        className={({ isActive }) =>
-                          classNames(
-                            "block text-sm font-medium py-2 px-3 rounded-md",
-                            isActive
-                              ? "text-blue-600 bg-blue-50 dark:bg-blue-900/20"
-                              : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-                          )
-                        }
-                      >
-                        {item.name}
-                      </NavLink>
-                    )
-                )
-              : // Public mobile navigation
-                publicNavItems.map(
-                  (item) =>
-                    item.auth && (
-                      <div key={item.name}>
-                        {item.url.startsWith("#") ? (
-                          <button
-                            onClick={() => handleAnchorClick(item.url, close)}
-                            className="block text-sm font-medium py-2 px-3 rounded-md w-full text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-                          >
-                            {item.name}
-                          </button>
-                        ) : (
-                          <NavLink
-                            onClick={close}
-                            to={item.url}
-                            end={item.end} // Use the 'end' prop here
-                            className={({ isActive }) =>
-                              classNames(
-                                "block text-sm font-medium py-2 px-3 rounded-md",
-                                isActive
-                                  ? "text-blue-600 bg-blue-50 dark:bg-blue-900/20"
-                                  : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-                              )
-                            }
-                          >
-                            {item.name}
-                          </NavLink>
-                        )}
-                      </div>
-                    )
-                )}
+          {/* Mobile panel */}
+          <DisclosurePanel className="border-t border-gray-200 bg-white/95 backdrop-blur-xl lg:hidden dark:border-gray-800 dark:bg-gray-950/95">
+            <div className="space-y-1 px-3 py-3">
+              {navItems.map((item) => renderLink(item, close, true))}
+              {!status && (
+                <div className="mt-3 flex gap-2 border-t border-gray-200 pt-3 dark:border-gray-800">
+                  <Link
+                    to="/signin"
+                    onClick={close}
+                    className="flex-1 rounded-lg border border-gray-300 px-4 py-2.5 text-center text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
+                  >
+                    Log in
+                  </Link>
+                  <Link
+                    to="/signup"
+                    onClick={close}
+                    className="flex-1 rounded-lg bg-brand-600 px-4 py-2.5 text-center text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-700"
+                  >
+                    Sign up
+                  </Link>
+                </div>
+              )}
+            </div>
           </DisclosurePanel>
         </>
       )}

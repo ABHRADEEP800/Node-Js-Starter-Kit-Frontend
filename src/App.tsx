@@ -5,6 +5,7 @@ import UserService from "./services/userService";
 import { useDispatch } from "react-redux";
 import { login, logout } from "./store/auth/authSlice";
 import { Header, Loading } from "./components";
+import Footer from "./components/Footer";
 
 function App() {
   const dispatch = useDispatch();
@@ -53,6 +54,7 @@ function App() {
         {/* It's good practice to wrap your content in a <main> tag */}
         <Outlet />
       </main>
+      <Footer />
     </>
   );
 }

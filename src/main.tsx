@@ -12,17 +12,23 @@ import {
 import { Provider } from "react-redux";
 import { store } from "./store/store.ts";
 import { Signin, Home, ForgotPassword, ResetPassword } from "./pages/";
+import NotFound from "./pages/NotFound.tsx";
 import { AuthLayout, DashboardComponent } from "./components/";
 import DashboardContainer from "./components/dashboard/DashbaordContainer.tsx";
 import Login2FAPage from "./components/login/2fa.tsx";
 import TwoFASettingsPage from "./components/user/2fasetting.tsx";
 import { registerSW } from "virtual:pwa-register";
+import { getValue } from "./util/localStorage.ts";
 import Signup from "./pages/Signup.tsx";
 import AdminDashboardComponent from "./components/dashboard/AdminDashboardComponent.tsx";
 import Profile from "./components/user/profile.tsx";
 import VerifyEmail from "./pages/VerifyEmail.tsx";
 
 registerSW({ immediate: true });
+
+// Apply saved theme before first render to avoid flash of wrong theme
+const savedTheme = getValue("theme") || "light";
+document.documentElement.classList.add(savedTheme);
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -119,7 +125,7 @@ const router = createBrowserRouter(
           <Route path="profile" element={<Profile />} />
         </Route>
 
-        <Route path="*" element={<h1>Page Not Found</h1>} />
+        <Route path="*" element={<NotFound />} />
       </>
     </Route>
   )

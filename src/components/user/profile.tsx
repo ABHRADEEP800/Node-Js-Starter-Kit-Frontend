@@ -150,14 +150,14 @@ const Profile = () => {
 
   if (!user.email) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-900 dark:border-white"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-6 px-4 sm:px-6 lg:px-8 font-sans transition-colors duration-200">
+    <div className="bg-gray-50 px-4 py-8 font-sans transition-colors duration-200 sm:px-6 lg:px-8 dark:bg-gray-950">
       <div className="max-w-5xl mx-auto">
         {/* Page Header */}
         <div className="mb-8">
@@ -386,7 +386,7 @@ const Profile = () => {
                             [field.key]: e.target.value,
                           })
                         }
-                        className="block w-full rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-gray-900 dark:focus:border-white focus:ring-1 focus:ring-gray-900 dark:focus:ring-white sm:text-sm py-2.5 px-3 pr-10 outline-none transition-shadow"
+                        className="block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm focus:border-brand-500 focus:ring-1 focus:ring-brand-500 sm:text-sm py-2.5 px-3 pr-10 outline-none transition-shadow"
                         required
                       />
                       <button
@@ -420,7 +420,7 @@ const Profile = () => {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 text-sm font-medium text-white bg-gray-900 hover:bg-black dark:bg-white dark:text-black dark:hover:bg-gray-200 rounded-lg shadow-sm transition-colors"
+                    className="px-4 py-2 text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition-colors"
                   >
                     Update Password
                   </button>

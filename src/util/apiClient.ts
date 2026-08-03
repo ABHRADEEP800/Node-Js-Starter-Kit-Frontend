@@ -78,7 +78,7 @@ export const apiClient = async (
           cachedCsrfToken = newToken;
         }
       }
-    } catch (e) {
+    } catch {
       // Ignore clone/json parsing errors
     }
 

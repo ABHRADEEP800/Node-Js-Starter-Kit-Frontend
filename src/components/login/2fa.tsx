@@ -150,9 +150,9 @@ const Login2FAPage: React.FC = () => {
   }
 
   return (
-    <div className="flex justify-center items-center px-4 bg-gray-50 dark:bg-gray-900 min-h-[calc(100vh-4rem)] py-12">
+    <div className="flex justify-center items-center px-4 bg-gray-50 dark:bg-gray-950 min-h-[calc(100vh-4rem)] py-12">
       {/* Container matching LoginComponent */}
-      <div className="w-full max-w-md bg-white dark:bg-gray-800 p-5 sm:p-8 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700">
+      <div className="w-full max-w-md bg-white dark:bg-gray-900 p-5 sm:p-8 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-center mb-2 text-gray-900 dark:text-white">
           2FA Verification
         </h1>
@@ -183,7 +183,7 @@ const Login2FAPage: React.FC = () => {
             </div>
           ) : (
             <div
-              className="flex justify-center gap-1.5 min-380px:gap-2 sm:gap-3"
+              className="flex justify-center gap-1.5 min-[380px]:gap-2 sm:gap-3"
               onPaste={handlePaste}
             >
               {verificationCode.map((digit, index) => (
