@@ -143,8 +143,12 @@ const Login2FAPage: React.FC = () => {
 
   if (isCheckingSession) {
     return (
-      <div className="flex justify-center items-center min-h-[calc(100vh-4rem)] py-12 bg-gray-50 dark:bg-gray-900">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="flex justify-center items-center min-h-[calc(100vh-4rem)] py-12 bg-gray-50 dark:bg-gray-950">
+        <div
+          className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-brand-600 dark:border-gray-700 dark:border-t-brand-400"
+          role="status"
+          aria-label="Loading"
+        />
       </div>
     );
   }
@@ -176,7 +180,7 @@ const Login2FAPage: React.FC = () => {
                   ${
                     error
                       ? "border-red-500 bg-red-50 text-red-600 focus:ring-2 focus:ring-red-200"
-                      : "border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900"
+                      : "border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-brand-500 focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-900"
                   }
                 `}
               />
@@ -206,7 +210,7 @@ const Login2FAPage: React.FC = () => {
                     ${
                       error
                         ? "border-red-500 bg-red-50 text-red-600 focus:ring-2 focus:ring-red-200"
-                        : "border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-900"
+                        : "border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:border-brand-500 focus:ring-2 focus:ring-brand-200 dark:focus:ring-brand-900"
                     }
                   `}
                 />
@@ -215,9 +219,11 @@ const Login2FAPage: React.FC = () => {
           )}
 
           {/* Timer & Error Display */}
-          <div className="flex justify-between items-center text-sm">
+          <div className="flex justify-between items-center gap-3 text-sm">
             {error ? (
-              <span className="text-red-600 font-medium">{error}</span>
+              <span className="min-w-0 flex-1 font-medium text-red-600 dark:text-red-400">
+                {error}
+              </span>
             ) : (
               <span className="text-gray-500 dark:text-gray-400">
                 Time remaining:
@@ -225,7 +231,7 @@ const Login2FAPage: React.FC = () => {
             )}
 
             <span
-              className={`font-mono font-bold ${timeLeft < 60 ? "text-red-500" : "text-blue-600 dark:text-blue-400"}`}
+              className={`shrink-0 font-mono font-bold ${timeLeft < 60 ? "text-red-500 dark:text-red-400" : "text-brand-600 dark:text-brand-400"}`}
             >
               {timeLeft > 0 ? formatTime(timeLeft) : "Expired"}
             </span>
@@ -238,7 +244,7 @@ const Login2FAPage: React.FC = () => {
                 type="submit"
                 disabled={isLoading}
                 isLoading={isLoading}
-                className="w-full h-10 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold rounded-lg shadow-md transition dark:bg-blue-500 dark:hover:bg-blue-400 dark:disabled:bg-blue-300"
+                className="h-11"
               >
                 {isLoading ? "Verifying..." : "Verify Code"}
               </Button>
@@ -246,7 +252,7 @@ const Login2FAPage: React.FC = () => {
               <Button
                 type="button"
                 onClick={() => navigate("/signin")}
-                className="w-full h-10 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow-md transition"
+                className="bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-500 h-11"
               >
                 Back to Login
               </Button>
@@ -258,7 +264,7 @@ const Login2FAPage: React.FC = () => {
           {isUsingBackupCode ? "Found your device? " : "Lost your device? "}
           <button
             type="button"
-            className="text-blue-600 dark:text-blue-400 font-medium hover:underline focus:outline-none"
+            className="font-medium text-brand-600 hover:underline focus-visible:outline-2 focus-visible:outline-brand-600 focus-visible:outline-offset-2 dark:text-brand-400"
             onClick={() => {
               setIsUsingBackupCode(!isUsingBackupCode);
               setError(null);

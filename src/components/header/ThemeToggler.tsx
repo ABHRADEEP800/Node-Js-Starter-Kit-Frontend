@@ -18,15 +18,19 @@ export default function ThemeToggler() {
   return (
     <button
       onClick={toggleTheme}
+      type="button"
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      aria-pressed={isDark}
       title={isDark ? "Switch to light mode" : "Switch to dark mode"}
       className="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-2 focus-visible:outline-brand-600 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
     >
-      {isDark ? (
-        <SunIcon className="h-5 w-5" />
-      ) : (
-        <MoonIcon className="h-5 w-5" />
-      )}
+      <span className="flex items-center justify-center transition-transform duration-300 ease-out">
+        {isDark ? (
+          <SunIcon className="h-5 w-5" />
+        ) : (
+          <MoonIcon className="h-5 w-5" />
+        )}
+      </span>
     </button>
   );
 }

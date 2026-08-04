@@ -55,7 +55,7 @@ function LoginComponent() {
           Login
         </h1>
 
-        <form onSubmit={handleSubmit(userLogin)} className="space-y-4">
+        <form onSubmit={handleSubmit(userLogin)} className="space-y-5">
           {/* Username */}
           <Input
             label="Username or email"
@@ -75,24 +75,19 @@ function LoginComponent() {
             })}
           />
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
+          <div className="flex items-center justify-between gap-3">
+            <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
               <input
                 type="checkbox"
                 id="rememberMe"
                 {...register("rememberMe")}
-                className="mr-2"
+                className="h-4 w-4 cursor-pointer rounded border-gray-300 bg-white text-brand-600 accent-brand-600 focus-visible:outline-2 focus-visible:outline-brand-600 focus-visible:outline-offset-2 dark:border-gray-600 dark:bg-gray-800"
               />
-              <label
-                htmlFor="rememberMe"
-                className="text-sm text-gray-700 dark:text-gray-300"
-              >
-                Remember this device
-              </label>
-            </div>
+              Remember this device
+            </label>
             <Link
               to="/forgot-password"
-              className="text-sm text-blue-600 dark:text-blue-400 hover:underline font-medium"
+              className="shrink-0 text-sm font-medium text-brand-600 hover:underline dark:text-brand-400"
             >
               Forgot password?
             </Link>
@@ -104,7 +99,7 @@ function LoginComponent() {
               type="submit"
               disabled={isSubmitting}
               isLoading={isSubmitting}
-              className="w-full h-10 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold rounded-lg shadow-md transition dark:bg-blue-500 dark:hover:bg-blue-400 dark:disabled:bg-blue-300"
+              className="h-11"
             >
               {isSubmitting ? "Logging in..." : "Login"}
             </Button>
@@ -114,7 +109,7 @@ function LoginComponent() {
           Don't have an account?{" "}
           <Link
             to="/signup"
-            className="text-blue-600 dark:text-blue-400 font-medium hover:underline"
+            className="font-medium text-brand-600 hover:underline dark:text-brand-400"
           >
             Sign up
           </Link>

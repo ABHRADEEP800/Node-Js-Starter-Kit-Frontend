@@ -46,7 +46,11 @@ const VerifyEmail: React.FC = () => {
         </h1>
 
         {status === "loading" && (
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto my-4"></div>
+          <div
+            className="mx-auto my-4 h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-brand-600 dark:border-gray-700 dark:border-t-brand-400"
+            role="status"
+            aria-label="Verifying"
+          />
         )}
 
         {status === "success" && (
@@ -92,7 +96,7 @@ const VerifyEmail: React.FC = () => {
         {(status === "success" || status === "error") && (
           <Link
             to="/signin"
-            className="inline-block w-full h-10 leading-10 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition"
+            className="inline-block w-full rounded-lg bg-brand-600 py-3 text-center font-semibold text-white shadow-md transition hover:bg-brand-700"
           >
             Go to Login
           </Link>

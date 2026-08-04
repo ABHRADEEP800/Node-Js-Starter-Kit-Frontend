@@ -207,12 +207,14 @@ class UserService {
   }
 
   async checkUsernameAvailability(
-    username: string
+    username: string,
+    signal?: AbortSignal
   ): Promise<{ available: boolean; message: string }> {
     const response = await apiClient(
       `/user/check-username?username=${encodeURIComponent(username)}`,
       {
         method: "GET",
+        signal, // allows the caller to cancel in-flight availability checks
       }
     );
     const data = await response.json();
@@ -223,12 +225,14 @@ class UserService {
   }
 
   async checkEmailAvailability(
-    email: string
+    email: string,
+    signal?: AbortSignal
   ): Promise<{ available: boolean; message: string }> {
     const response = await apiClient(
       `/user/check-email?email=${encodeURIComponent(email)}`,
       {
         method: "GET",
+        signal, // allows the caller to cancel in-flight availability checks
       }
     );
     const data = await response.json();

@@ -189,7 +189,7 @@ function Header() {
               </div>
 
               {/* Right actions */}
-              <div className="flex flex-1 items-center justify-end gap-1 lg:flex-none">
+              <div className="flex flex-none items-center justify-end gap-1 lg:flex-none">
                 <ThemeToggler />
                 {status ? (
                   <UserMenu
@@ -197,11 +197,11 @@ function Header() {
                     role={loggedInUser?.role || "user"}
                   />
                 ) : (
-                  <div className="flex items-center gap-2 ms-1">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
                     <Link
                       to="/signin"
                       className={classNames(
-                        "rounded-lg px-4 py-2 text-sm font-semibold transition-all",
+                        "whitespace-nowrap rounded-lg px-2.5 py-2 text-sm font-semibold transition-all sm:px-4",
                         location.pathname === "/signin"
                           ? "hidden"
                           : "text-gray-700 hover:text-brand-600 dark:text-gray-200 dark:hover:text-brand-400"
@@ -212,7 +212,7 @@ function Header() {
                     <Link
                       to="/signup"
                       className={classNames(
-                        "rounded-lg px-4 py-2 text-sm font-semibold shadow-sm transition-all active:scale-[0.98]",
+                        "whitespace-nowrap rounded-lg px-2.5 py-2 text-sm font-semibold shadow-sm transition-all active:scale-[0.98] sm:px-4",
                         location.pathname === "/signup"
                           ? "hidden"
                           : "bg-brand-600 text-white shadow-brand-600/25 hover:bg-brand-700"

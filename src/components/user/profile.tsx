@@ -62,6 +62,21 @@ const Profile = () => {
     enabled: false,
   });
 
+  // Close the password modal with Escape and lock body scroll while open.
+  useEffect(() => {
+    if (!showPasswordModal) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setShowPasswordModal(false);
+    };
+    document.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [showPasswordModal]);
+
   // --- Initialization ---
   useEffect(() => {
     // Sync User Data from Redux
@@ -173,7 +188,7 @@ const Profile = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* --- LEFT COLUMN: Profile Info (2 cols wide on desktop) --- */}
           <div className="md:col-span-2 space-y-6">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
               <div className="p-6">
                 {/* Avatar & Basic Info */}
                 <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-8">
@@ -283,7 +298,7 @@ const Profile = () => {
 
           {/* --- RIGHT COLUMN: 2FA Status (1 col on desktop) --- */}
           <div className="md:col-span-1">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 h-full flex flex-col">
+            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 h-full flex flex-col">
               <div className="flex items-center mb-4">
                 <ShieldCheckIcon className="w-6 h-6 text-gray-900 dark:text-white mr-3" />
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -349,16 +364,26 @@ const Profile = () => {
           ></div>
 
           <div className="flex min-h-full items-center justify-center p-4">
-            <div className="relative transform overflow-hidden rounded-xl bg-white dark:bg-gray-800 text-left shadow-xl transition-all w-full max-w-md border border-gray-200 dark:border-gray-700">
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="change-password-title"
+              className="relative w-full max-w-md transform overflow-hidden rounded-xl bg-white text-left shadow-xl transition-all border border-gray-200 dark:bg-gray-900 dark:border-gray-700"
+            >
               <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h3
+                  id="change-password-title"
+                  className="text-lg font-semibold text-gray-900 dark:text-white"
+                >
                   Change Password
                 </h3>
                 <button
+                  type="button"
                   onClick={() => setShowPasswordModal(false)}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                  aria-label="Close"
+                  className="rounded-lg p-1 text-gray-400 transition-colors hover:text-gray-600 focus-visible:outline-2 focus-visible:outline-brand-600 dark:hover:text-gray-200"
                 >
-                  <XMarkIcon className="w-5 h-5" />
+                  <XMarkIcon className="h-5 w-5" />
                 </button>
               </div>
 

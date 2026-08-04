@@ -72,14 +72,14 @@ function ResetPassword() {
             <div className="space-y-4">
               <Link
                 to="/forgot-password"
-                className="inline-flex justify-center w-full py-2.5 px-4 rounded-lg font-medium bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+                className="inline-flex justify-center w-full py-2.5 px-4 rounded-lg font-medium bg-brand-600 hover:bg-brand-700 text-white transition-colors"
               >
                 Request New Link
               </Link>
               <div className="border-t border-gray-100 dark:border-gray-700 pt-4">
                 <Link
                   to="/signin"
-                  className="inline-flex items-center text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  className="inline-flex items-center text-sm font-semibold text-gray-700 transition-colors hover:text-brand-600 dark:text-gray-300 dark:hover:text-brand-400"
                 >
                   Back to Login
                 </Link>
@@ -119,10 +119,7 @@ function ResetPassword() {
               sessions have been terminated for security. You can now log in
               using your new credentials.
             </p>
-            <Button
-              onClick={() => navigate("/signin")}
-              className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md"
-            >
+            <Button onClick={() => navigate("/signin")} className="h-11">
               Sign In
             </Button>
           </div>
@@ -182,7 +179,7 @@ function ResetPassword() {
           <div className="text-center mt-8 pt-6 border-t border-gray-100 dark:border-gray-700">
             <Link
               to="/signin"
-              className="inline-flex items-center text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              className="inline-flex items-center text-sm font-semibold text-gray-600 transition-colors hover:text-brand-600 dark:text-gray-400 dark:hover:text-brand-400"
             >
               <svg
                 className="h-4 w-4 mr-2"

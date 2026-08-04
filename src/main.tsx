@@ -18,7 +18,7 @@ import DashboardContainer from "./components/dashboard/DashbaordContainer.tsx";
 import Login2FAPage from "./components/login/2fa.tsx";
 import TwoFASettingsPage from "./components/user/2fasetting.tsx";
 import { registerSW } from "virtual:pwa-register";
-import { getValue } from "./util/localStorage.ts";
+import { getInitialTheme } from "./util/localStorage.ts";
 import Signup from "./pages/Signup.tsx";
 import AdminDashboardComponent from "./components/dashboard/AdminDashboardComponent.tsx";
 import Profile from "./components/user/profile.tsx";
@@ -26,8 +26,10 @@ import VerifyEmail from "./pages/VerifyEmail.tsx";
 
 registerSW({ immediate: true });
 
-// Apply saved theme before first render to avoid flash of wrong theme
-const savedTheme = getValue("theme") || "light";
+// Apply the saved / system-preferred theme before first render.
+// (An inline script in index.html already did this pre-paint; this keeps the
+// Redux store and the DOM in sync in case the preference changed mid-session.)
+const savedTheme = getInitialTheme();
 document.documentElement.classList.add(savedTheme);
 
 const router = createBrowserRouter(

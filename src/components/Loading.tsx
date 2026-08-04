@@ -11,7 +11,7 @@ function Loading({
     <div
       className={`${
         fullScreen
-          ? "fixed inset-0 z-50 bg-white dark:bg-gray-950"
+          ? "fixed inset-0 z-50 bg-gray-50 dark:bg-gray-950"
           : "w-full min-h-[200px]"
       } flex flex-col items-center justify-center p-4 transition-colors duration-300`}
     >
@@ -19,7 +19,7 @@ function Loading({
         {/* Minimalist premium spinner */}
         <div className="relative w-10 h-10">
           <div className="w-full h-full rounded-full border-2 border-gray-100 dark:border-gray-800" />
-          <div className="absolute inset-0 w-full h-full rounded-full border-2 border-transparent border-t-blue-600 dark:border-t-blue-500 animate-spin" />
+          <div className="absolute inset-0 h-full w-full animate-spin rounded-full border-2 border-transparent border-t-brand-600 dark:border-t-brand-400" />
         </div>
 
         {/* Message */}

@@ -1,8 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getValue, setValue } from "../../util/localStorage";
+import { getInitialTheme, setValue } from "../../util/localStorage";
 
-const defaultTheme = getValue("theme") || "light";
-const initialState: { pageTheme: string } = { pageTheme: defaultTheme };
+const initialState: { pageTheme: string } = {
+  pageTheme: getInitialTheme(),
+};
 
 export const themeSlice = createSlice({
   name: "theme",
@@ -13,6 +14,16 @@ export const themeSlice = createSlice({
       document.querySelector("html")?.classList.remove("light", "dark");
       document.querySelector("html")?.classList.add(action.payload);
       setValue("theme", action.payload);
+
+      // Keep the mobile browser chrome (URL bar) color in sync with the theme.
+      document
+        .querySelectorAll('meta[name="theme-color"]')
+        .forEach((meta) =>
+          meta.setAttribute(
+            "content",
+            action.payload === "dark" ? "#030712" : "#f9fafb"
+          )
+        );
     },
   },
 });

@@ -76,14 +76,14 @@ function ForgotPasswordContent() {
           <div className="space-y-4">
             <button
               onClick={() => setSubmittedEmail(null)}
-              className="text-sm text-blue-600 dark:text-blue-400 hover:underline font-medium block w-full text-center"
+              className="block w-full text-center text-sm font-medium text-brand-600 hover:underline dark:text-brand-400"
             >
               Try another email address
             </button>
             <div className="border-t border-gray-100 dark:border-gray-700 pt-4">
               <Link
                 to="/signin"
-                className="inline-flex items-center text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                className="inline-flex items-center text-sm font-semibold text-gray-700 transition-colors hover:text-brand-600 dark:text-gray-300 dark:hover:text-brand-400"
               >
                 <svg
                   className="h-4 w-4 mr-2"
@@ -146,7 +146,7 @@ function ForgotPasswordContent() {
         <div className="text-center mt-8 pt-6 border-t border-gray-100 dark:border-gray-700">
           <Link
             to="/signin"
-            className="inline-flex items-center text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            className="inline-flex items-center text-sm font-semibold text-gray-600 transition-colors hover:text-brand-600 dark:text-gray-400 dark:hover:text-brand-400"
           >
             <svg
               className="h-4 w-4 mr-2"

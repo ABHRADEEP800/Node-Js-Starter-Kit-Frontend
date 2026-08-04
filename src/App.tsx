@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import { useEffect, useState } from "react";
 import UserService from "./services/userService";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { login, logout } from "./store/auth/authSlice";
 import { Header, Loading } from "./components";
 import Footer from "./components/Footer";
@@ -10,6 +10,12 @@ import Footer from "./components/Footer";
 function App() {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState<boolean>(true);
+
+  // Keep toast notifications in sync with the active color theme.
+  const themeMode: string = useSelector(
+    (state: { theme: { pageTheme: string } }) => state.theme.pageTheme
+  );
+  const isDark = themeMode === "dark";
 
   // REWRITTEN: This effect now runs ONLY ONCE on initial app load.
   useEffect(() => {
@@ -36,7 +42,7 @@ function App() {
   }
 
   return (
-    <>
+    <div className="flex min-h-screen flex-col">
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -47,15 +53,15 @@ function App() {
         pauseOnFocusLoss
         draggable
         pauseOnHover
+        theme={isDark ? "dark" : "light"}
       />
       <Header />
-      <main>
-        {" "}
-        {/* It's good practice to wrap your content in a <main> tag */}
+      {/* flex-1 keeps the footer pinned to the bottom on short pages. */}
+      <main className="flex-1">
         <Outlet />
       </main>
       <Footer />
-    </>
+    </div>
   );
 }
 

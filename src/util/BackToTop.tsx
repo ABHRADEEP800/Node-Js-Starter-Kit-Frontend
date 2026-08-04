@@ -46,12 +46,12 @@ const BackToTop = () => {
           onClick={scrollToTop}
           className={`
             fixed z-40 flex items-center justify-center
-            bg-gradient-to-r from-blue-600 to-purple-600 
-            text-white 
-            shadow-lg hover:shadow-xl 
+            bg-gradient-to-r from-brand-600 to-indigo-600
+            text-white
+            shadow-lg hover:shadow-xl
             transform hover:scale-105 active:scale-95
-            focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none
-            transition-all duration-300 
+            focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600
+            transition-all duration-300
             backdrop-blur-sm
             touch-manipulation
             group
@@ -85,7 +85,7 @@ const BackToTop = () => {
           )}
 
           {/* Subtle glow effect on hover */}
-          <div className="absolute inset-0 rounded-inherit bg-gradient-to-r from-blue-400/20 to-purple-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+          <div className="pointer-events-none absolute inset-0 rounded-inherit bg-gradient-to-r from-brand-400/20 to-indigo-400/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
         </button>
       )}
     </>

@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { Button, Input } from "../";
 import { useForm } from "react-hook-form";
 import UserService from "../../services/userService";
@@ -6,6 +5,59 @@ import { Link, useNavigate } from "react-router-dom";
 import type { UserSignup } from "../../types";
 import { toast } from "react-toastify";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
+import { useDebouncedAsyncCheck, type AsyncCheckResult } from "../../hooks";
+
+const USERNAME_PATTERN = /^[a-zA-Z0-9_]+$/;
+const EMAIL_PATTERN = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+
+/** Live format validation for the username field (empty = no message yet). */
+function usernameFormatError(value: string): string | null {
+  if (!value) return null;
+  if (value.length < 3) return "Username must be at least 3 characters";
+  if (!USERNAME_PATTERN.test(value)) {
+    return "Invalid characters (use alphanumeric & _)";
+  }
+  return null;
+}
+
+/** Live format validation for the email field (empty = no message yet). */
+function emailFormatError(value: string): string | null {
+  if (!value) return null;
+  return EMAIL_PATTERN.test(value) ? null : "Enter a valid email address";
+}
+
+type AvailabilityData = { available: boolean; message: string };
+type InputStatus = "error" | "success" | "loading";
+
+interface FieldFeedback {
+  error?: string;
+  message?: string;
+  status?: InputStatus;
+}
+
+/**
+ * Maps a debounced availability check + client-side format validation into the
+ * props the <Input> component needs to render its status row.
+ */
+function availabilityFeedback(
+  check: AsyncCheckResult<AvailabilityData>,
+  rhfError: string | undefined,
+  formatError: string | null
+): FieldFeedback {
+  if (rhfError) return { error: rhfError, status: "error" };
+  if (formatError) return { error: formatError, status: "error" };
+  if (check.pending) return { status: "loading", message: "Checking..." };
+  if (check.status === "success") {
+    if (check.data?.available) {
+      return { status: "success", message: "Available" };
+    }
+    return { error: check.data?.message, status: "error" };
+  }
+  if (check.status === "error") {
+    return { error: check.error ?? undefined, status: "error" };
+  }
+  return {};
+}
 
 function RegisterComponent() {
   const navigate = useNavigate();
@@ -22,104 +74,66 @@ function RegisterComponent() {
   const usernameVal = watch("username");
   const emailVal = watch("email");
 
-  const [usernameStatus, setUsernameStatus] = useState<{
-    checking: boolean;
-    available: boolean | null;
-    message: string;
-  }>({ checking: false, available: null, message: "" });
+  // Enterprise-grade debounced availability checks: trailing debounce, abortable
+  // requests, and race protection so a stale response can never win.
+  const usernameCheck = useDebouncedAsyncCheck({
+    value: usernameVal ?? "",
+    delay: 400,
+    shouldRun: (v) => v.length >= 3 && USERNAME_PATTERN.test(v),
+    fetcher: (v, signal) => UserService.checkUsernameAvailability(v, signal),
+  });
 
-  const [emailStatus, setEmailStatus] = useState<{
-    checking: boolean;
-    available: boolean | null;
-    message: string;
-  }>({ checking: false, available: null, message: "" });
+  const emailCheck = useDebouncedAsyncCheck({
+    value: emailVal ?? "",
+    delay: 400,
+    shouldRun: (v) => v.length > 0 && EMAIL_PATTERN.test(v),
+    fetcher: (v, signal) => UserService.checkEmailAvailability(v, signal),
+  });
 
-  // Debounced check for username availability
-  useEffect(() => {
-    if (!usernameVal || usernameVal.length < 3) {
-      setUsernameStatus({ checking: false, available: null, message: "" });
-      return;
-    }
+  const usernameIsUnavailable =
+    usernameCheck.result.status === "success" &&
+    usernameCheck.result.data?.available === false;
 
-    const usernameRegex = /^[a-zA-Z0-9_]+$/;
-    if (!usernameRegex.test(usernameVal)) {
-      setUsernameStatus({
-        checking: false,
-        available: false,
-        message: "Invalid characters (use alphanumeric & _)",
-      });
-      return;
-    }
+  const emailIsUnavailable =
+    emailCheck.result.status === "success" &&
+    emailCheck.result.data?.available === false;
 
-    setUsernameStatus({ checking: true, available: null, message: "" });
-
-    const handler = setTimeout(async () => {
-      try {
-        const res = await UserService.checkUsernameAvailability(usernameVal);
-        setUsernameStatus({
-          checking: false,
-          available: res.available,
-          message: res.message,
-        });
-      } catch (error: any) {
-        setUsernameStatus({
-          checking: false,
-          available: null,
-          message: "Check failed",
-        });
-      }
-    }, 400);
-
-    return () => clearTimeout(handler);
-  }, [usernameVal]);
-
-  // Debounced check for email availability
-  useEffect(() => {
-    if (!emailVal) {
-      setEmailStatus({ checking: false, available: null, message: "" });
-      return;
-    }
-
-    const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
-    if (!emailRegex.test(emailVal)) {
-      setEmailStatus({ checking: false, available: null, message: "" });
-      return;
-    }
-
-    setEmailStatus({ checking: true, available: null, message: "" });
-
-    const handler = setTimeout(async () => {
-      try {
-        const res = await UserService.checkEmailAvailability(emailVal);
-        setEmailStatus({
-          checking: false,
-          available: res.available,
-          message: res.message,
-        });
-      } catch (error: any) {
-        setEmailStatus({
-          checking: false,
-          available: null,
-          message: "Check failed",
-        });
-      }
-    }, 400);
-
-    return () => clearTimeout(handler);
-  }, [emailVal]);
+  // Combine RHF + live format + debounced availability into Input props.
+  const usernameFb = availabilityFeedback(
+    usernameCheck.result,
+    errors.username?.message,
+    usernameFormatError(usernameVal ?? "")
+  );
+  const emailFb = availabilityFeedback(
+    emailCheck.result,
+    errors.email?.message,
+    emailFormatError(emailVal ?? "")
+  );
 
   const userSignup = async (data: UserSignup): Promise<void> => {
-    if (usernameStatus.available === false) {
+    // Defence-in-depth: reject invalid formats even if RHF validation didn't.
+    if (usernameFormatError(usernameVal ?? "")) {
+      toast.error("Please enter a valid username");
+      return;
+    }
+
+    if (emailFormatError(emailVal ?? "")) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    if (usernameIsUnavailable) {
       toast.error("Please select an available username");
       return;
     }
 
-    if (emailStatus.available === false) {
+    if (emailIsUnavailable) {
       toast.error("Please enter an unregistered email address");
       return;
     }
 
-    if (usernameStatus.checking || emailStatus.checking) {
+    // A request may be mid-debounce or mid-flight — never submit on stale data.
+    if (usernameCheck.result.pending || emailCheck.result.pending) {
       toast.info(
         "Please wait for username/email availability checks to complete"
       );
@@ -148,7 +162,7 @@ function RegisterComponent() {
           Create Account
         </h1>
 
-        <form onSubmit={handleSubmit(userSignup)} className="space-y-4">
+        <form onSubmit={handleSubmit(userSignup)} className="space-y-5">
           {/* Full name */}
           <Input
             label="Full Name"
@@ -160,45 +174,34 @@ function RegisterComponent() {
           {/* Username */}
           <Input
             label="Username"
-            error={
-              errors.username?.message ||
-              (usernameStatus.available === false
-                ? usernameStatus.message
-                : undefined)
-            }
-            message={
-              usernameStatus.checking
-                ? "Checking..."
-                : usernameStatus.available === true
-                  ? "✓ Available"
-                  : undefined
-            }
+            error={usernameFb.error}
+            message={usernameFb.message}
+            status={usernameFb.status}
             placeholder="e.g. johndoe"
-            {...register("username", { required: "Username is required" })}
+            {...register("username", {
+              required: "Username is required",
+              minLength: {
+                value: 3,
+                message: "Username must be at least 3 characters",
+              },
+              pattern: {
+                value: USERNAME_PATTERN,
+                message: "Invalid characters (use alphanumeric & _)",
+              },
+            })}
           />
 
           {/* Email */}
           <Input
             label="Email"
             placeholder="e.g. example@domain.com"
-            error={
-              errors.email?.message ||
-              (emailStatus.available === false
-                ? emailStatus.message
-                : undefined)
-            }
-            message={
-              emailStatus.checking
-                ? "Checking..."
-                : emailStatus.available === true
-                  ? "✓ Available"
-                  : undefined
-            }
+            error={emailFb.error}
+            message={emailFb.message}
+            status={emailFb.status}
             {...register("email", {
               required: "Email is required",
               validate: (value) =>
-                /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
-                "Enter a valid email address",
+                EMAIL_PATTERN.test(value) || "Enter a valid email address",
             })}
           />
 
@@ -237,7 +240,7 @@ function RegisterComponent() {
               type="submit"
               isLoading={isSubmitting}
               disabled={isSubmitting}
-              className="w-full h-10 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold rounded-lg shadow-md transition dark:bg-blue-500 dark:hover:bg-blue-400 dark:disabled:bg-blue-300"
+              className="h-11"
             >
               {isSubmitting ? "Registering..." : "Register"}
             </Button>
@@ -248,7 +251,7 @@ function RegisterComponent() {
           Already have an account?{" "}
           <Link
             to="/signin"
-            className="text-blue-600 dark:text-blue-400 font-medium hover:underline"
+            className="font-medium text-brand-600 hover:underline dark:text-brand-400"
           >
             Login
           </Link>
