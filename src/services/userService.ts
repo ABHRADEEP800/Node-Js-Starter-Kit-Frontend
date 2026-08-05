@@ -155,10 +155,13 @@ class UserService {
     return data;
   }
 
-  async changeName(fullName: string): Promise<ApiResponse<{ user: User }>> {
+  async changeName(
+    firstName: string,
+    lastName: string
+  ): Promise<ApiResponse<{ user: User }>> {
     const response = await apiClient("/user/change-name", {
       method: "POST",
-      body: JSON.stringify({ fullName }),
+      body: JSON.stringify({ firstName, lastName }),
     });
     const data = await response.json();
     if (!response.ok) throw new ApiError(data.message);

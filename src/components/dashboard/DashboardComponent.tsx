@@ -46,7 +46,7 @@ const DashboardComponent = () => {
         <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-xl font-bold sm:text-2xl">
-              Welcome back, {loggedInUser?.fullName?.split(" ")[0] || "friend"}
+              Welcome back, {loggedInUser?.firstName || "friend"}
             </h2>
             <p className="mt-1.5 text-sm text-brand-100">
               Your account is healthy and protected. Here's what's happening.

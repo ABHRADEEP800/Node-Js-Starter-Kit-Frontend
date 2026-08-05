@@ -1,5 +1,6 @@
 export type UserSignup = {
-  fullName: string;
+  firstName: string;
+  lastName: string;
   username: string;
   email: string;
   password: string;

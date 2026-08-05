@@ -163,13 +163,23 @@ function RegisterComponent() {
         </h1>
 
         <form onSubmit={handleSubmit(userSignup)} className="space-y-5">
-          {/* Full name */}
-          <Input
-            label="Full Name"
-            error={errors.fullName?.message}
-            placeholder="e.g. John Doe"
-            {...register("fullName", { required: "Full Name is required" })}
-          />
+          {/* Name */}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <Input
+              label="First Name"
+              error={errors.firstName?.message}
+              placeholder="e.g. John"
+              {...register("firstName", {
+                required: "First name is required",
+              })}
+            />
+            <Input
+              label="Last Name"
+              error={errors.lastName?.message}
+              placeholder="e.g. Doe"
+              {...register("lastName", { required: "Last name is required" })}
+            />
+          </div>
 
           {/* Username */}
           <Input

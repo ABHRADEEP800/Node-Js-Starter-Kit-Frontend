@@ -16,7 +16,8 @@ import type { AuthState } from "../../store/auth/authSlice.ts";
 
 // --- Interfaces ---
 interface UserProfile {
-  fullName: string;
+  firstName: string;
+  lastName: string;
   email: string;
   username: string;
 }
@@ -36,12 +37,14 @@ const Profile = () => {
 
   // --- 2. Profile State ---
   const [user, setUser] = useState<UserProfile>({
-    fullName: "",
+    firstName: "",
+    lastName: "",
     email: "",
     username: "",
   });
   const [isEditingName, setIsEditingName] = useState(false);
-  const [tempName, setTempName] = useState("");
+  const [tempFirstName, setTempFirstName] = useState("");
+  const [tempLastName, setTempLastName] = useState("");
   const [isSavingName, setIsSavingName] = useState(false);
 
   // --- 3. Password Modal State ---
@@ -82,11 +85,13 @@ const Profile = () => {
     // Sync User Data from Redux
     if (loggedInUser) {
       setUser({
-        fullName: loggedInUser.fullName,
+        firstName: loggedInUser.firstName,
+        lastName: loggedInUser.lastName,
         email: loggedInUser.email,
         username: loggedInUser.username,
       });
-      setTempName(loggedInUser.fullName);
+      setTempFirstName(loggedInUser.firstName);
+      setTempLastName(loggedInUser.lastName);
     }
 
     // Fetch 2FA Status independently
@@ -115,13 +120,18 @@ const Profile = () => {
   // ==========================================
 
   const handleUpdateName = async () => {
-    if (!tempName.trim()) return toast.error("Name cannot be empty");
+    if (!tempFirstName.trim()) return toast.error("First name cannot be empty");
+    if (!tempLastName.trim()) return toast.error("Last name cannot be empty");
 
     try {
       setIsSavingName(true);
-      const res = await userService.changeName(tempName);
+      const res = await userService.changeName(tempFirstName, tempLastName);
       if (res.success) {
-        setUser((prev) => ({ ...prev, fullName: tempName }));
+        setUser((prev) => ({
+          ...prev,
+          firstName: tempFirstName,
+          lastName: tempLastName,
+        }));
         setIsEditingName(false);
         toast.success("Name updated successfully");
       }
@@ -217,7 +227,7 @@ const Profile = () => {
                   <div className="border-t border-gray-100 dark:border-gray-700 pt-6">
                     <div className="flex justify-between items-center mb-2">
                       <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Full Name
+                        Name
                       </label>
                       {!isEditingName && (
                         <button
@@ -232,20 +242,29 @@ const Profile = () => {
 
                     {isEditingName ? (
                       <div className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg border border-gray-200 dark:border-gray-600">
-                        {/* Fixed Duplicate w-full here */}
-                        <input
-                          type="text"
-                          value={tempName}
-                          onChange={(e) => setTempName(e.target.value)}
-                          className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-md focus:ring-1 focus:ring-gray-900 dark:focus:ring-white focus:border-gray-900 dark:focus:border-white block p-2.5 mb-3 outline-none"
-                          autoFocus
-                          placeholder="Enter your full name"
-                        />
+                        <div className="grid grid-cols-2 gap-2 mb-3">
+                          <input
+                            type="text"
+                            value={tempFirstName}
+                            onChange={(e) => setTempFirstName(e.target.value)}
+                            className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-md focus:ring-1 focus:ring-gray-900 dark:focus:ring-white focus:border-gray-900 dark:focus:border-white block p-2.5 outline-none"
+                            autoFocus
+                            placeholder="First name"
+                          />
+                          <input
+                            type="text"
+                            value={tempLastName}
+                            onChange={(e) => setTempLastName(e.target.value)}
+                            className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-md focus:ring-1 focus:ring-gray-900 dark:focus:ring-white focus:border-gray-900 dark:focus:border-white block p-2.5 outline-none"
+                            placeholder="Last name"
+                          />
+                        </div>
                         <div className="flex justify-end space-x-2">
                           <button
                             onClick={() => {
                               setIsEditingName(false);
-                              setTempName(user.fullName);
+                              setTempFirstName(user.firstName);
+                              setTempLastName(user.lastName);
                             }}
                             className="px-3 py-1.5 text-xs font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
                           >
@@ -269,7 +288,9 @@ const Profile = () => {
                       </div>
                     ) : (
                       <p className="text-gray-900 dark:text-white text-base">
-                        {user.fullName || "Not set"}
+                        {user.firstName && user.lastName
+                          ? `${user.firstName} ${user.lastName}`
+                          : "Not set"}
                       </p>
                     )}
                   </div>
