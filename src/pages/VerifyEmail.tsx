@@ -7,16 +7,14 @@ const VerifyEmail: React.FC = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   const [status, setStatus] = useState<"loading" | "success" | "error">(
-    "loading"
+    token ? "loading" : "error"
   );
-  const [message, setMessage] = useState("Verifying your email...");
+  const [message, setMessage] = useState(
+    token ? "Verifying your email..." : "Invalid verification link."
+  );
 
   useEffect(() => {
-    if (!token) {
-      setStatus("error");
-      setMessage("Invalid verification link.");
-      return;
-    }
+    if (!token) return;
 
     apiClient(`/user/verify-email?token=${token}`, { method: "GET" })
       .then((res) => res.json())

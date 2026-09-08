@@ -73,7 +73,7 @@ const AdminDashboardComponent = () => {
             to="profile"
             className="inline-flex w-fit items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-indigo-700 transition-colors hover:bg-indigo-50"
           >
-            <UserGroupIcon className="h-4.5 w-4.5" />
+            <UserGroupIcon className="h-[1.125rem] w-[1.125rem]" />
             Account settings
           </Link>
         </div>

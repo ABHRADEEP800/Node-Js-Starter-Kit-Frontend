@@ -45,20 +45,30 @@ export const apiClient = async (
 ): Promise<Response> => {
   const { headers, ...restOptions } = options;
   const method = options.method || "GET";
+  const isSimpleMethod = ["GET", "HEAD", "OPTIONS"].includes(
+    method.toUpperCase()
+  );
 
   let csrfToken = "strict";
-  if (!["GET", "HEAD", "OPTIONS"].includes(method.toUpperCase())) {
+  if (!isSimpleMethod) {
     csrfToken = await fetchCsrfToken();
+  }
+
+  // Only attach JSON/CSRF headers on state-changing methods. Adding custom
+  // headers to GET forces the browser to send a CORS preflight (OPTIONS)
+  // round-trip *before every request*, doubling latency on an API server that
+  // may already be remote/slow. GETs carry no body and need no CSRF token, so
+  // they stay "simple requests" and skip preflight entirely.
+  const headersToSend: Record<string, string> = { ...headers };
+  if (!isSimpleMethod) {
+    headersToSend["Content-Type"] = "application/json";
+    headersToSend["x-csrf-token"] = csrfToken;
   }
 
   // 1. Default Configuration
   const config: RequestInit = {
     ...restOptions,
-    headers: {
-      "Content-Type": "application/json",
-      "x-csrf-token": csrfToken,
-      ...headers,
-    },
+    headers: headersToSend,
     credentials: "include", // 👈 Keeps cookies attached
   };
 

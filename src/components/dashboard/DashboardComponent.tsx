@@ -57,14 +57,14 @@ const DashboardComponent = () => {
               to="profile"
               className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-white/15 px-4 py-2.5 text-sm font-semibold backdrop-blur transition-colors hover:bg-white/25 sm:flex-none"
             >
-              <UserCircleIcon className="h-4.5 w-4.5" />
+              <UserCircleIcon className="h-[1.125rem] w-[1.125rem]" />
               View profile
             </Link>
             <Link
               to="security"
               className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-brand-700 transition-colors hover:bg-brand-50 sm:flex-none"
             >
-              <ShieldCheckIcon className="h-4.5 w-4.5" />
+              <ShieldCheckIcon className="h-[1.125rem] w-[1.125rem]" />
               Security
             </Link>
           </div>
@@ -255,7 +255,7 @@ const DashboardComponent = () => {
               to="security"
               className="flex items-center justify-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-800 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
             >
-              <ShieldCheckIcon className="h-4.5 w-4.5" />
+              <ShieldCheckIcon className="h-[1.125rem] w-[1.125rem]" />
               Manage security
             </Link>
           </div>

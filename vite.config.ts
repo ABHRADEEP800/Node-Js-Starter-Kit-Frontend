@@ -24,10 +24,11 @@ export default defineConfig({
         swDest: "dist/sw.js",
       },
       manifest: {
-        name: "Alpha Fitness Gym",
-        short_name: "Alpha Fitness",
-        description: "Alpha Fitness Gym - Your Ultimate Fitness Destination",
-        theme_color: "#352838",
+        name: "Starter Kit",
+        short_name: "Starter Kit",
+        description:
+          "Production-ready authentication starter kit — sessions, CSRF, 2FA, passkeys, RBAC.",
+        theme_color: "#2563eb",
         start_url: "/",
         icons: [
           {
@@ -58,9 +59,21 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
+        // Issue 123: only collapse truly heavy vendor deps into their own
+        // chunk. Stuffing every node_modules dep into one "vendor" chunk
+        // defeats the point of code-splitting.
         manualChunks(id) {
-          if (id.includes('node_modules')) {
-            return 'vendor';
+          if (id.includes("node_modules")) {
+            if (id.includes("react") || id.includes("scheduler")) {
+              return "react";
+            }
+            if (id.includes("@reduxjs") || id.includes("react-redux")) {
+              return "redux";
+            }
+            if (id.includes("@simplewebauthn")) {
+              return "passkey";
+            }
+            return "vendor";
           }
         },
       },

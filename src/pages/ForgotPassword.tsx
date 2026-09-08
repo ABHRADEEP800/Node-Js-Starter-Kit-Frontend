@@ -8,6 +8,7 @@ import {
 } from "react-google-recaptcha-v3";
 import { Button, Input, Container } from "../components";
 import userService from "../services/userService";
+import { getErrorMessage, withTimeout } from "../util/errors";
 
 interface ForgotPasswordForm {
   email: string;
@@ -30,7 +31,11 @@ function ForgotPasswordContent() {
     }
 
     try {
-      const recaptchaToken = await executeRecaptcha("forgot_password");
+      const recaptchaToken = await withTimeout(
+        executeRecaptcha("forgot_password"),
+        "reCAPTCHA timed out. Please try again.",
+        8000
+      );
       if (!recaptchaToken) {
         toast.error("reCAPTCHA validation failed.");
         return;
@@ -39,8 +44,10 @@ function ForgotPasswordContent() {
       const res = await userService.forgotPassword(data.email, recaptchaToken);
       setSubmittedEmail(data.email);
       toast.success(res.message || "Reset link sent!");
-    } catch (error: any) {
-      toast.error(error.message || "An error occurred. Please try again.");
+    } catch (error: unknown) {
+      toast.error(
+        getErrorMessage(error, "An error occurred. Please try again.")
+      );
     }
   };
 

@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { login } from "../../store/auth/authSlice";
 import { toast } from "react-toastify";
 import { Button } from "../"; // Importing your custom Button component
+import { getErrorMessage, asApiError } from "../../util/errors";
 
 const Login2FAPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -29,16 +30,15 @@ const Login2FAPage: React.FC = () => {
         // If successful, user is already logged in
         toast.info("You are already logged in");
         navigate("/");
-      } catch (err: any) {
-        // Specific check: usually 403 or specific message implies 2FA is needed
-        if (
-          err.message?.includes("2FA verification incomplete") ||
-          err.statusCode === 403
-        ) {
+      } catch (err: unknown) {
+        const fErr = asApiError(err);
+        // Issue 65/66: only the specific "2FA pending" message keeps us on
+        // the page. Any other 403 means the session is gone.
+        if (fErr.message?.includes("2FA verification incomplete")) {
           setIsCheckingSession(false);
         } else {
           toast.error("Session expired. Please login again.");
-          navigate("/signin"); // Changed to /signin to match your previous Link
+          navigate("/signin");
         }
       }
     };
@@ -121,10 +121,11 @@ const Login2FAPage: React.FC = () => {
         navigate("/");
         toast.success(response.message);
       }
-    } catch (error: any) {
-      setError(error?.message || "Verification failed");
-      toast.error(error?.message || "Verification failed");
-      if (error?.message?.includes("expired")) {
+    } catch (error: unknown) {
+      const msg = getErrorMessage(error, "Verification failed");
+      setError(msg);
+      toast.error(msg);
+      if (msg.includes("expired")) {
         setTimeout(() => navigate("/signin"), 2000);
       }
       // Reset inputs on failure

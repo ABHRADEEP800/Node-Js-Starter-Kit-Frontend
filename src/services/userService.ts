@@ -1,7 +1,15 @@
 // src/services/UserService.ts
 
-import type { ApiResponse, User, UserLogin } from "../types/";
+import type { ApiResponse, User, UserLogin, Passkey } from "../types/";
 import type { UserSignup } from "../types/userSignup";
+import type {
+  AuthenticationResponseJSON,
+  RegistrationResponseJSON,
+} from "../types/passkey";
+import type {
+  PublicKeyCredentialRequestOptionsJSON,
+  PublicKeyCredentialCreationOptionsJSON,
+} from "@simplewebauthn/browser";
 import ApiError from "../util/ApiError";
 import { apiClient } from "../util/apiClient"; // 👈 Import the new client
 
@@ -171,7 +179,7 @@ class UserService {
   async changePassword(
     currentPassword: string,
     newPassword: string
-  ): Promise<ApiResponse<{}>> {
+  ): Promise<ApiResponse<Record<string, never>>> {
     const response = await apiClient("/user/change-pass", {
       method: "POST",
       body: JSON.stringify({ currentPassword, newPassword }),
@@ -243,6 +251,100 @@ class UserService {
       available: data.data?.available ?? false,
       message: data.message || "",
     };
+  }
+
+  // ==========================================
+  // 🔑 PASSKEY (WEBAUTHN) METHODS
+  // ==========================================
+
+  /**
+   * Public — starts a passkey login. `identifier` (username/email) is optional;
+   * omitting it yields an empty allow-list and lets the user pick any passkey.
+   * Returns options ready for `startAuthentication()`.
+   */
+  async getPasskeyLoginOptions(
+    identifier: string,
+    recaptchaToken: string
+  ): Promise<ApiResponse<PublicKeyCredentialRequestOptionsJSON>> {
+    const response = await apiClient("/user/passkey/login/options", {
+      method: "POST",
+      body: JSON.stringify({ identifier, recaptchaToken }),
+    });
+    const data = await response.json();
+    if (!response.ok)
+      throw new ApiError(data.message || "Failed to start passkey login");
+    return data;
+  }
+
+  async verifyPasskeyLogin(
+    response: AuthenticationResponseJSON,
+    rememberMe: boolean
+  ): Promise<
+    ApiResponse<{
+      user: User | null;
+      twofaEnabled?: boolean;
+      csrfToken?: string;
+    }>
+  > {
+    const res = await apiClient("/user/passkey/login/verify", {
+      method: "POST",
+      body: JSON.stringify({ response, rememberMe }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new ApiError(data.message || "Passkey login failed");
+    return data;
+  }
+
+  async getPasskeyRegistrationOptions(
+    name: string
+  ): Promise<ApiResponse<PublicKeyCredentialCreationOptionsJSON>> {
+    const response = await apiClient("/user/passkey/register/options", {
+      method: "POST",
+      body: JSON.stringify({ name }),
+    });
+    const data = await response.json();
+    if (!response.ok)
+      throw new ApiError(
+        data.message || "Failed to start passkey registration"
+      );
+    return data;
+  }
+
+  async verifyPasskeyRegistration(
+    name: string,
+    response: RegistrationResponseJSON
+  ): Promise<ApiResponse<{ passkey: Passkey }>> {
+    const res = await apiClient("/user/passkey/register/verify", {
+      method: "POST",
+      body: JSON.stringify({ name, response }),
+    });
+    const data = await res.json();
+    if (!res.ok)
+      throw new ApiError(data.message || "Passkey registration failed");
+    return data;
+  }
+
+  async listPasskeys(): Promise<ApiResponse<{ passkeys: Passkey[] }>> {
+    const response = await apiClient("/user/passkey/list", {
+      method: "GET",
+    });
+    const data = await response.json();
+    if (!response.ok)
+      throw new ApiError(data.message || "Failed to list passkeys");
+    return data;
+  }
+
+  async deletePasskey(id: string): Promise<ApiResponse<null>> {
+    const response = await apiClient(
+      `/user/passkey/${encodeURIComponent(id)}`,
+      {
+        method: "DELETE",
+      }
+    );
+    const data = await response.json();
+    if (!response.ok)
+      throw new ApiError(data.message || "Failed to remove passkey");
+    return data;
   }
 }
 

@@ -4,6 +4,7 @@ import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Button, Input, Container } from "../components";
 import userService from "../services/userService";
+import { getErrorMessage } from "../util/errors";
 
 interface ResetPasswordForm {
   password: string;
@@ -35,9 +36,9 @@ function ResetPassword() {
       const res = await userService.resetPassword(token, data.password);
       setIsSuccess(true);
       toast.success(res.message || "Password has been reset successfully!");
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error(
-        error.message || "An error occurred while resetting password."
+        getErrorMessage(error, "An error occurred while resetting password.")
       );
     }
   };

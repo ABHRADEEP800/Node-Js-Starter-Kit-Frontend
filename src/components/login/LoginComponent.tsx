@@ -7,6 +7,8 @@ import type { UserLogin } from "../../types";
 import { toast } from "react-toastify";
 import userService from "../../services/userService";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
+import { withTimeout } from "../../util/errors";
+import PasskeyLoginButton from "./PasskeyLogin";
 
 function LoginComponent() {
   const dispatch = useDispatch();
@@ -16,9 +18,17 @@ function LoginComponent() {
   const {
     register,
     handleSubmit,
-
+    watch,
     formState: { errors, isSubmitting },
-  } = useForm<UserLogin>();
+  } = useForm<UserLogin>({
+    defaultValues: {
+      username: "",
+      password: "",
+      rememberMe: false,
+    },
+  });
+
+  const usernameValue = watch("username") || "";
 
   const userLogin = async (data: UserLogin): Promise<void> => {
     if (!executeRecaptcha) {
@@ -26,7 +36,11 @@ function LoginComponent() {
       return;
     }
 
-    const token = await executeRecaptcha("login");
+    const token = await withTimeout(
+      executeRecaptcha("login"),
+      "reCAPTCHA timed out. Please try again.",
+      8000
+    );
     if (!token) {
       toast.error("Recaptcha verification failed");
       return;
@@ -105,6 +119,26 @@ function LoginComponent() {
             </Button>
           </div>
         </form>
+
+        {/* Passkey login */}
+        <div className="mt-5">
+          <div className="relative my-4">
+            <div aria-hidden className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200 dark:border-gray-700"></div>
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="bg-white dark:bg-gray-900 px-3 text-gray-500 dark:text-gray-400">
+                or
+              </span>
+            </div>
+          </div>
+          <PasskeyLoginButton
+            identifier={usernameValue}
+            executeRecaptcha={executeRecaptcha}
+            disabled={isSubmitting}
+          />
+        </div>
+
         <p className="text-center mt-6 text-sm text-gray-700 dark:text-gray-300">
           Don't have an account?{" "}
           <Link

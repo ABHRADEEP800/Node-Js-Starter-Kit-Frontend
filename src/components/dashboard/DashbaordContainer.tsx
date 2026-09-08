@@ -62,7 +62,7 @@ function DashboardContainer() {
                   }`
                 }
               >
-                <tab.icon className="h-4.5 w-4.5" />
+                <tab.icon className="h-[1.125rem] w-[1.125rem]" />
                 {tab.name}
               </NavLink>
             ))}

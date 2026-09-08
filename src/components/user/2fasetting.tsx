@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from "react";
 import userService from "../../services/userService";
 import type { SessionDevice } from "../../services/userService";
 import { toast } from "react-toastify";
+import PasskeySettings from "./PasskeySettings";
+import { getErrorMessage } from "../../util/errors";
 
 // --- Types ---
 interface TwoFAStatus {
@@ -76,23 +78,34 @@ const TwoFASettingsPage = () => {
   // 🔐 2FA LOGIC
   // ==========================================
 
-  const fetchTwoFAStatus = async () => {
-    try {
-      setIs2FALoading(true);
-      const response = await userService.get2fastatus();
-      if (response.success) {
-        setTwoFAStatus(
-          response.data.twofaEnabled
-            ? { enabled: true, verified: true }
-            : { enabled: false }
-        );
-      }
-    } catch (error: any) {
-      toast.error(error?.message || "Failed to fetch 2FA status");
-    } finally {
-      setIs2FALoading(false);
-    }
-  };
+  // --- Initial Data Fetching ---
+  useEffect(() => {
+    userService
+      .get2fastatus()
+      .then((response) => {
+        if (response.success) {
+          setTwoFAStatus(
+            response.data.twofaEnabled
+              ? { enabled: true, verified: true }
+              : { enabled: false }
+          );
+        }
+      })
+      .catch((error: unknown) =>
+        toast.error(getErrorMessage(error, "Failed to fetch 2FA status"))
+      )
+      .finally(() => setIs2FALoading(false));
+
+    userService
+      .getActiveSessions()
+      .then((response) => {
+        if (response.success) setSessions(response.data.sessions);
+      })
+      .catch((error: unknown) =>
+        console.error("Failed to fetch sessions", error)
+      )
+      .finally(() => setLoadingSessions(false));
+  }, []);
 
   const handleGenerate2FA = async () => {
     if (generatingRef.current) return;
@@ -106,8 +119,8 @@ const TwoFASettingsPage = () => {
         setStep("generating");
         toast.info("Scan the QR code with your authenticator app");
       }
-    } catch (error: any) {
-      setError(error?.message || "Failed to generate 2FA secret");
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, "Failed to generate 2FA secret"));
     } finally {
       setIsGenerating(false);
       generatingRef.current = false;
@@ -165,8 +178,8 @@ const TwoFASettingsPage = () => {
         setVerificationCode(["", "", "", "", "", ""]);
         toast.success("Two-factor authentication enabled successfully");
       }
-    } catch (error: any) {
-      setError(error?.message || "Failed to enable 2FA");
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, "Failed to enable 2FA"));
       setVerificationCode(["", "", "", "", "", ""]);
       inputRefs.current[0]?.focus();
     } finally {
@@ -194,8 +207,8 @@ const TwoFASettingsPage = () => {
         setVerificationCode(["", "", "", "", "", ""]);
         toast.success("Two-factor authentication disabled successfully");
       }
-    } catch (error: any) {
-      setError(error?.message || "Failed to disable 2FA");
+    } catch (error: unknown) {
+      setError(getErrorMessage(error, "Failed to disable 2FA"));
     } finally {
       setIs2FALoading(false);
       loading2FARef.current = false;
@@ -213,34 +226,14 @@ const TwoFASettingsPage = () => {
   // 📱 DEVICE MANAGEMENT LOGIC
   // ==========================================
 
-  const fetchSessions = async () => {
-    try {
-      setLoadingSessions(true);
-      const response = await userService.getActiveSessions();
-      if (response.success) {
-        setSessions(response.data.sessions);
-      }
-    } catch (error: any) {
-      console.error("Failed to fetch sessions", error);
-    } finally {
-      setLoadingSessions(false);
-    }
-  };
-
-  // --- Initial Data Fetching ---
-  useEffect(() => {
-    fetchTwoFAStatus();
-    fetchSessions();
-  }, []);
-
   const handleRevokeSession = async (sessionId: string) => {
     if (!confirm("Are you sure you want to log out this device?")) return;
     try {
       await userService.revokeSession(sessionId);
       setSessions((prev) => prev.filter((s) => s.id !== sessionId));
       toast.success("Device logged out successfully");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to revoke session");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Failed to revoke session"));
     }
   };
 
@@ -250,8 +243,8 @@ const TwoFASettingsPage = () => {
       await userService.revokeAllOtherSessions();
       setSessions((prev) => prev.filter((s) => s.isCurrent));
       toast.success("All other devices logged out");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to revoke devices");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Failed to revoke devices"));
     }
   };
 
@@ -568,6 +561,11 @@ const TwoFASettingsPage = () => {
             </div>
           )}
         </div>
+
+        {/* ======================= */}
+        {/* 1.5 PASSKEY SECTION      */}
+        {/* ======================= */}
+        <PasskeySettings />
 
         {/* ======================= */}
         {/* 2. SESSIONS SECTION     */}

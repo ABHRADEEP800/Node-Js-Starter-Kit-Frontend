@@ -12,6 +12,7 @@ import {
 } from "@heroicons/react/24/outline";
 import userService from "../../services/userService.ts";
 import { useSelector } from "react-redux";
+import { getErrorMessage } from "../../util/errors";
 import type { AuthState } from "../../store/auth/authSlice.ts";
 
 // --- Interfaces ---
@@ -36,15 +37,19 @@ const Profile = () => {
   const [isLoading2FA, setIsLoading2FA] = useState(true);
 
   // --- 2. Profile State ---
-  const [user, setUser] = useState<UserProfile>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    username: "",
-  });
+  const [user, setUser] = useState<UserProfile>(() => ({
+    firstName: loggedInUser?.firstName ?? "",
+    lastName: loggedInUser?.lastName ?? "",
+    email: loggedInUser?.email ?? "",
+    username: loggedInUser?.username ?? "",
+  }));
   const [isEditingName, setIsEditingName] = useState(false);
-  const [tempFirstName, setTempFirstName] = useState("");
-  const [tempLastName, setTempLastName] = useState("");
+  const [tempFirstName, setTempFirstName] = useState(
+    loggedInUser?.firstName ?? ""
+  );
+  const [tempLastName, setTempLastName] = useState(
+    loggedInUser?.lastName ?? ""
+  );
   const [isSavingName, setIsSavingName] = useState(false);
 
   // --- 3. Password Modal State ---
@@ -82,18 +87,6 @@ const Profile = () => {
 
   // --- Initialization ---
   useEffect(() => {
-    // Sync User Data from Redux
-    if (loggedInUser) {
-      setUser({
-        firstName: loggedInUser.firstName,
-        lastName: loggedInUser.lastName,
-        email: loggedInUser.email,
-        username: loggedInUser.username,
-      });
-      setTempFirstName(loggedInUser.firstName);
-      setTempLastName(loggedInUser.lastName);
-    }
-
     // Fetch 2FA Status independently
     const fetch2FA = async () => {
       try {
@@ -105,7 +98,7 @@ const Profile = () => {
               : { enabled: false }
           );
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error("Failed to fetch 2FA status", error);
       } finally {
         setIsLoading2FA(false);
@@ -135,8 +128,8 @@ const Profile = () => {
         setIsEditingName(false);
         toast.success("Name updated successfully");
       }
-    } catch (error: any) {
-      toast.error(error?.message || "Failed to update name");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Failed to update name"));
     } finally {
       setIsSavingName(false);
     }
@@ -164,8 +157,8 @@ const Profile = () => {
         setShowPasswordModal(false);
         setPassForm({ current: "", new: "", confirm: "" });
       }
-    } catch (error: any) {
-      toast.error(error?.message || "Failed to change password");
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Failed to change password"));
     }
   };
 
