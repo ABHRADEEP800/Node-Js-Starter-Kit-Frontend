@@ -22,7 +22,7 @@ const features = [
     icon: ShieldCheckIcon,
     title: "Secure Authentication",
     description:
-      "Production-ready sign in & registration with bcrypt hashing, JWT tokens, rate limiting and Helmet security headers baked in.",
+      "Production-ready sign in & registration with bcrypt + pepper hashing, hardened cookie sessions, rate limiting and Helmet security headers baked in.",
   },
   {
     icon: FingerPrintIcon,
@@ -168,7 +168,7 @@ function HomeComponent() {
             <div className="animate-fade-in mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs font-medium text-gray-500 dark:text-gray-400">
               <span className="flex items-center gap-1.5">
                 <CheckBadgeIcon className="h-4 w-4 text-green-500" />
-                JWT + refresh tokens
+                Hardened cookie sessions
               </span>
               <span className="flex items-center gap-1.5">
                 <CheckBadgeIcon className="h-4 w-4 text-green-500" />

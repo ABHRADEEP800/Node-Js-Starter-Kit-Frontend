@@ -6,6 +6,7 @@ import type { SessionDevice } from "../../services/userService";
 import { toast } from "react-toastify";
 import PasskeySettings from "./PasskeySettings";
 import { getErrorMessage } from "../../util/errors";
+import { ShieldCheckIcon } from "@heroicons/react/24/outline";
 
 // --- Types ---
 interface TwoFAStatus {
@@ -457,27 +458,30 @@ const TwoFASettingsPage = () => {
 
                 {twoFASecret.backupCodes &&
                   twoFASecret.backupCodes.length > 0 && (
-                    <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded text-left">
-                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 gap-2">
-                        <h3 className="text-yellow-800 font-semibold">
-                          Save these Backup Codes!
-                        </h3>
+                    <div className="mt-4 rounded-xl border border-brand-200 bg-brand-50 p-4 text-left dark:border-brand-800 dark:bg-brand-950/40">
+                      <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex items-center gap-2">
+                          <ShieldCheckIcon className="h-5 w-5 shrink-0 text-brand-600 dark:text-brand-400" />
+                          <h3 className="font-semibold text-brand-900 dark:text-brand-100">
+                            Save these Backup Codes!
+                          </h3>
+                        </div>
                         <button
                           onClick={handleDownloadBackupCodes}
-                          className="text-xs bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1.5 rounded transition shadow-sm font-medium w-full sm:w-auto"
+                          className="w-full rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-700 sm:w-auto"
                         >
                           ⬇ Download as .txt
                         </button>
                       </div>
-                      <p className="text-yellow-700 text-sm mb-3">
+                      <p className="mb-3 text-sm text-brand-800 dark:text-brand-200">
                         If you lose your authenticator app, you can use these
                         one-time codes to log in. Save them somewhere safe.
                       </p>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 font-mono text-sm text-gray-800">
+                      <div className="grid grid-cols-1 gap-2 font-mono text-sm sm:grid-cols-2">
                         {twoFASecret.backupCodes.map((code) => (
                           <div
                             key={code}
-                            className="bg-white px-2 py-2 border border-yellow-300 rounded text-center tracking-wider"
+                            className="rounded-lg border border-brand-200 bg-white px-2 py-2 text-center tracking-wider text-gray-800 dark:border-brand-800 dark:bg-gray-900 dark:text-gray-100"
                           >
                             {code}
                           </div>

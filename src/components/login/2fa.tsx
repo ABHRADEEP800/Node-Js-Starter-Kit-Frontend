@@ -18,9 +18,17 @@ const Login2FAPage: React.FC = () => {
   const [isUsingBackupCode, setIsUsingBackupCode] = useState(false);
   const [backupCode, setBackupCode] = useState("");
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const redirectTimer = useRef<number | null>(null);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  // Clear any pending redirect timer on unmount (no navigation after teardown).
+  useEffect(() => {
+    return () => {
+      if (redirectTimer.current) window.clearTimeout(redirectTimer.current);
+    };
+  }, []);
 
   // 1️⃣ SECURITY GUARD
   useEffect(() => {
@@ -126,7 +134,7 @@ const Login2FAPage: React.FC = () => {
       setError(msg);
       toast.error(msg);
       if (msg.includes("expired")) {
-        setTimeout(() => navigate("/signin"), 2000);
+        redirectTimer.current = window.setTimeout(() => navigate("/signin"), 2000);
       }
       // Reset inputs on failure
       setVerificationCode(Array(6).fill(""));

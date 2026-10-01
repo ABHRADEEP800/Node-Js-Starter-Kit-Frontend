@@ -21,8 +21,15 @@ import { registerSW } from "virtual:pwa-register";
 import { getInitialTheme } from "./util/localStorage.ts";
 import Signup from "./pages/Signup.tsx";
 import AdminDashboardComponent from "./components/dashboard/AdminDashboardComponent.tsx";
+import AdminRightsCases from "./components/admin/AdminRightsCases.tsx";
+import AdminNomineeClaims from "./components/admin/AdminNomineeClaims.tsx";
+import AdminBreaches from "./components/admin/AdminBreaches.tsx";
+import AdminCompliance from "./components/admin/AdminCompliance.tsx";
 import Profile from "./components/user/profile.tsx";
 import VerifyEmail from "./pages/VerifyEmail.tsx";
+import PrivacyNotice from "./pages/PrivacyNotice.tsx";
+import PrivacyCenter from "./pages/PrivacyCenter.tsx";
+import NomineeClaim from "./pages/NomineeClaim.tsx";
 
 registerSW({ immediate: true });
 
@@ -97,6 +104,36 @@ const router = createBrowserRouter(
           }
         />
 
+        {/* DPDP: the privacy notice must be readable by EVERYONE (s. 5), so it
+            is gated as "any" — logged-in and logged-out alike. */}
+        <Route
+          path="/privacy-notice"
+          element={
+            <AuthLayout authentication="any">
+              <PrivacyNotice />
+            </AuthLayout>
+          }
+        />
+        <Route
+          path="/privacy"
+          element={
+            <AuthLayout authentication={true}>
+              <PrivacyCenter />
+            </AuthLayout>
+          }
+        />
+
+        {/* s. 14 — PUBLIC nominee claim (death/incapacity). Reachable by
+            anyone, logged in or not, since a nominee may have no account. */}
+        <Route
+          path="/nominee-claim"
+          element={
+            <AuthLayout authentication="any">
+              <NomineeClaim />
+            </AuthLayout>
+          }
+        />
+
         {/* Protected routes: accessible only when logged in */}
         <Route
           path="/dashboard"
@@ -122,6 +159,10 @@ const router = createBrowserRouter(
           }
         >
           <Route index element={<AdminDashboardComponent />} />
+          <Route path="rights" element={<AdminRightsCases />} />
+          <Route path="nominee-claims" element={<AdminNomineeClaims />} />
+          <Route path="breaches" element={<AdminBreaches />} />
+          <Route path="compliance" element={<AdminCompliance />} />
 
           <Route path="security" element={<TwoFASettingsPage />} />
           <Route path="profile" element={<Profile />} />

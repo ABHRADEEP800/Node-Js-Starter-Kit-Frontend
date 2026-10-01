@@ -408,11 +408,15 @@ const Profile = () => {
                   { label: "Confirm Password", key: "confirm" },
                 ].map((field) => (
                   <div key={field.key}>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    <label
+                      htmlFor={`pw-${field.key}`}
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                    >
                       {field.label}
                     </label>
                     <div className="relative">
                       <input
+                        id={`pw-${field.key}`}
                         type={
                           showPass[field.key as keyof typeof showPass]
                             ? "text"

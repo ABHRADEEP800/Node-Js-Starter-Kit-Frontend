@@ -49,6 +49,26 @@ function Footer() {
             >
               Sign in
             </Link>
+            {/* DPDP Act 2023: notice + rights surfaces */}
+            <Link
+              to="/privacy-notice"
+              className="transition-colors hover:text-brand-600 dark:hover:text-brand-400"
+            >
+              Privacy Notice
+            </Link>
+            <Link
+              to="/privacy"
+              className="transition-colors hover:text-brand-600 dark:hover:text-brand-400"
+            >
+              Privacy Center
+            </Link>
+            {/* DPDP s. 14: a nominee (who may have no account) files a claim. */}
+            <Link
+              to="/nominee-claim"
+              className="transition-colors hover:text-brand-600 dark:hover:text-brand-400"
+            >
+              Nominee Claim
+            </Link>
           </nav>
 
           <p className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">

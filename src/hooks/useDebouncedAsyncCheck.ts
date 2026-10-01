@@ -72,6 +72,10 @@ export function useDebouncedAsyncCheck<T, R>({
     data: null,
     error: null,
   });
+  // True while a request is actually in flight. `outcome.forValue` alone can't
+  // express this for the FIRST request (it is initialised to `value`, so the
+  // derived `requestInFlight` would be false while the very first call runs).
+  const [inFlight, setInFlight] = useState(false);
 
   // Keep the latest callbacks without forcing the request effect to re-run.
   const optsRef = useRef({ fetcher, shouldRun, errorMessage });
@@ -98,6 +102,7 @@ export function useDebouncedAsyncCheck<T, R>({
 
     const controller = new AbortController();
     const requestId = ++requestIdRef.current;
+    setInFlight(true);
 
     run(debouncedValue, controller.signal)
       .then((data) => {
@@ -126,6 +131,9 @@ export function useDebouncedAsyncCheck<T, R>({
           data: null,
           error: error instanceof Error ? error.message : fallbackError,
         });
+      })
+      .finally(() => {
+        if (requestId === requestIdRef.current) setInFlight(false);
       });
 
     // Abort the request when a newer value arrives or the hook unmounts.
@@ -136,7 +144,7 @@ export function useDebouncedAsyncCheck<T, R>({
   // raw input changes (during the debounce window) until the request settles.
   const canRunNow = shouldRun ? shouldRun(value) : true;
   const isDebouncing = value !== debouncedValue;
-  const requestInFlight = debouncedValue !== outcome.forValue;
+  const requestInFlight = inFlight || debouncedValue !== outcome.forValue;
   const checking = canRunNow && (isDebouncing || requestInFlight);
 
   const status: AsyncCheckStatus = !canRunNow

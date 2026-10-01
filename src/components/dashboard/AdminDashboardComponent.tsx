@@ -3,11 +3,12 @@ import { useSelector } from "react-redux";
 import {
   ShieldCheckIcon,
   UserGroupIcon,
-  Cog6ToothIcon,
   ArrowRightIcon,
   CheckCircleIcon,
-  ServerStackIcon,
-  WrenchScrewdriverIcon,
+  InboxIcon,
+  ExclamationTriangleIcon,
+  ScaleIcon,
+  Cog6ToothIcon,
 } from "@heroicons/react/24/outline";
 import type { AuthState } from "../../store/auth/authSlice";
 
@@ -16,34 +17,44 @@ const AdminDashboardComponent = () => {
     (state: { auth: AuthState }) => state.auth
   );
 
-  const modules = [
+  const modules: {
+    icon: typeof InboxIcon;
+    title: string;
+    description: string;
+    accent: string;
+    to?: string;
+  }[] = [
+    {
+      icon: InboxIcon,
+      title: "Rights & grievance inbox",
+      description:
+        "Action access, correction, erasure, grievance and nomination requests (DPDP ss. 11–14).",
+      accent: "bg-indigo-50 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400",
+      to: "rights",
+    },
     {
       icon: UserGroupIcon,
-      title: "User management",
+      title: "Nominee claims",
       description:
-        "Connect your user directory here — list, search, promote and suspend accounts.",
-      accent: "bg-indigo-50 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400",
-    },
-    {
-      icon: ShieldCheckIcon,
-      title: "Security oversight",
-      description:
-        "Monitor 2FA adoption and session activity across your entire user base.",
+        "Review death/incapacity claims filed by nominees and approve or reject them (DPDP s. 14).",
       accent: "bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400",
+      to: "nominee-claims",
     },
     {
-      icon: ServerStackIcon,
-      title: "Audit & analytics",
+      icon: ExclamationTriangleIcon,
+      title: "Breach workflow",
       description:
-        "Extend with login events, failed attempts and usage metrics per user.",
-      accent: "bg-violet-50 text-violet-600 dark:bg-violet-950 dark:text-violet-400",
+        "Open incidents and track Rule 7 Board reports + data-principal notices on the 72-hour clock.",
+      accent: "bg-red-50 text-red-600 dark:bg-red-950 dark:text-red-400",
+      to: "breaches",
     },
     {
-      icon: WrenchScrewdriverIcon,
-      title: "Site settings",
+      icon: ScaleIcon,
+      title: "Compliance registers",
       description:
-        "Tweak application-wide settings like signup policy and security rules.",
+        "Cross-border transfers, DPIA/SDF register, audit-chain proof and retention runs.",
       accent: "bg-amber-50 text-amber-600 dark:bg-amber-950 dark:text-amber-400",
+      to: "compliance",
     },
   ];
 
@@ -137,29 +148,45 @@ const AdminDashboardComponent = () => {
       </p>
 
       <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {modules.map((mod) => (
-          <div
-            key={mod.title}
-            className="group flex gap-4 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-indigo-700"
-          >
-            <div
-              className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${mod.accent}`}
-            >
-              <mod.icon className="h-5.5 w-5.5" />
+        {modules.map((mod) => {
+          const inner = (
+            <>
+              <div
+                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${mod.accent}`}
+              >
+                <mod.icon className="h-5.5 w-5.5" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                  {mod.title}
+                </p>
+                <p className="mt-1 text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+                  {mod.description}
+                </p>
+                {mod.to ? (
+                  <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400">
+                    Open <ArrowRightIcon className="h-3 w-3" />
+                  </span>
+                ) : (
+                  <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-gray-400 dark:text-gray-500">
+                    Coming soon
+                  </span>
+                )}
+              </div>
+            </>
+          );
+          const base =
+            "group flex gap-4 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 dark:hover:border-indigo-700";
+          return mod.to ? (
+            <Link key={mod.title} to={mod.to} className={base}>
+              {inner}
+            </Link>
+          ) : (
+            <div key={mod.title} className={base}>
+              {inner}
             </div>
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                {mod.title}
-              </p>
-              <p className="mt-1 text-sm leading-relaxed text-gray-500 dark:text-gray-400">
-                {mod.description}
-              </p>
-              <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400">
-                Coming soon <ArrowRightIcon className="h-3 w-3" />
-              </span>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

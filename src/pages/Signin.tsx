@@ -1,15 +1,12 @@
-import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
 import { Container, LoginComponent } from "../components";
+import RecaptchaProviderGate from "../components/privacy/RecaptchaProviderGate";
 
 function Signin() {
   return (
     <Container>
-      <GoogleReCaptchaProvider
-        reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
-        scriptProps={{ async: true, defer: true }}
-      >
+      <RecaptchaProviderGate>
         <LoginComponent />
-      </GoogleReCaptchaProvider>
+      </RecaptchaProviderGate>
     </Container>
   );
 }

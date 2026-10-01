@@ -1,4 +1,40 @@
+# Frontend (Vite) environment — copy to `.env` and fill in.
+#
+# API the SPA talks to. VITE_API_HOST_URL is the backend origin; the client
+# builds URLs as `${VITE_API_HOST_URL}${VITE_API_DEFAULT_PATH}${endpoint}`.
 VITE_API_HOST_URL=http://localhost:5000
 VITE_API_DEFAULT_PATH=/api/v1
-VITE_RECAPTCHA_SITE_KEY=6LdDUfo
+
+# Your project name (shown in the UI/emails).
 VITE_PROJECT_NAME=Starter Kit
+
+# Google reCAPTCHA v3 SITE key (public — safe to expose in the browser).
+# HOW TO GET IT:
+#   1. Go to https://www.google.com/recaptcha/admin/create
+#   2. Choose reCAPTCHA v3, add the domains you serve from, submit.
+#      IMPORTANT: add EVERY hostname you load the app from — including
+#      `localhost` for local dev — under "Domains".
+#   3. Copy the SITE key here and the SECRET key into the BACKEND env
+#      (RECAPTCHA_SECRET_KEY) from the SAME registration. Rotate together.
+# WHY IT MATTERS (DPDP): reCAPTCHA sets Google cookies and sends a risk
+#   score. It is a functional/security tracker — the app explains what is
+#   collected and why, and asks for consent before loading it (see the
+#   `captcha` tracker in the cookie banner). Signup/login need it, so if a
+#   user rejects it we re-ask with a clear explanation rather than silently
+#   loading it.
+#
+# TROUBLESHOOTING — "api.js?render=KEY → 400 Bad Request":
+#   Google returns 400 when the key is missing, mistyped, or not registered
+#   for the current domain. Fixes:
+#     • The value below must be a reCAPTCHA v3 SITE key (starts with 6L…).
+#     • In the reCAPTCHA console, open this key and add the current hostname
+#       (e.g. `localhost`) to its Domains list.
+#     • The SITE key and the backend SECRET key must be from the SAME key
+#       registration (a site key with a different secret fails verification).
+#     • Vite only reads `.env` at start — restart `npm run dev` after edits.
+#   The UI now shows a clear "security check could not load" error instead of
+#   hanging, so this is visible rather than silent.
+VITE_RECAPTCHA_SITE_KEY=
+
+# Non-secret app config
+VITE_GOOGLE_RECAPTCHA_ENABLED=true

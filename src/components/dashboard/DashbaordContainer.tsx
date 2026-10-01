@@ -3,14 +3,25 @@ import {
   HomeIcon,
   UserCircleIcon,
   ShieldCheckIcon,
+  InboxIcon,
+  UserGroupIcon,
+  ExclamationTriangleIcon,
+  ScaleIcon,
 } from "@heroicons/react/24/outline";
 import { useSelector } from "react-redux";
 import type { AuthState } from "../../store/auth/authSlice";
 
-const tabs = [
+const baseTabs = [
   { name: "Overview", to: "", end: true, icon: HomeIcon },
   { name: "Profile", to: "profile", end: false, icon: UserCircleIcon },
   { name: "Security", to: "security", end: false, icon: ShieldCheckIcon },
+];
+
+const adminTabs = [
+  { name: "Rights inbox", to: "rights", end: false, icon: InboxIcon },
+  { name: "Nominee claims", to: "nominee-claims", end: false, icon: UserGroupIcon },
+  { name: "Breaches", to: "breaches", end: false, icon: ExclamationTriangleIcon },
+  { name: "Compliance", to: "compliance", end: false, icon: ScaleIcon },
 ];
 
 function DashboardContainer() {
@@ -21,6 +32,7 @@ function DashboardContainer() {
   const isAdmin = location.pathname.startsWith("/admin-dashboard");
   const basePath = isAdmin ? "/admin-dashboard" : "/dashboard";
   const isOverview = location.pathname === basePath;
+  const tabs = isAdmin ? [...baseTabs, ...adminTabs] : baseTabs;
 
   const greeting =
     new Date().getHours() < 12

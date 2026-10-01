@@ -2,11 +2,9 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import {
-  GoogleReCaptchaProvider,
-  useGoogleReCaptcha,
-} from "react-google-recaptcha-v3";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { Button, Input, Container } from "../components";
+import RecaptchaProviderGate from "../components/privacy/RecaptchaProviderGate";
 import userService from "../services/userService";
 import { getErrorMessage, withTimeout } from "../util/errors";
 
@@ -179,12 +177,9 @@ function ForgotPasswordContent() {
 function ForgotPassword() {
   return (
     <Container>
-      <GoogleReCaptchaProvider
-        reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
-        scriptProps={{ async: true, defer: true }}
-      >
+      <RecaptchaProviderGate>
         <ForgotPasswordContent />
-      </GoogleReCaptchaProvider>
+      </RecaptchaProviderGate>
     </Container>
   );
 }

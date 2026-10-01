@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { MoonIcon, SunIcon } from "@heroicons/react/24/outline";
 import { setTheme } from "../../store/theme/themeSlice";
+import { applyTheme } from "../../util/localStorage";
 
 export default function ThemeToggler() {
   const themeMode: string = useSelector(
@@ -12,7 +13,10 @@ export default function ThemeToggler() {
   const isDark = themeMode === "dark";
 
   const toggleTheme = () => {
-    dispatch(setTheme(isDark ? "light" : "dark"));
+    const next = isDark ? "light" : "dark";
+    // Side effects (DOM + localStorage) happen here, not in the reducer.
+    applyTheme(next);
+    dispatch(setTheme(next));
   };
 
   return (

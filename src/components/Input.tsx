@@ -46,7 +46,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     // Show the feedback row when there is either an error or a status message.
     const hasError = !!error || status === "error";
     const showLoading = !hasError && status === "loading";
-    const feedback = error || message;
+    const feedback = error || message || (showLoading ? "Checking…" : undefined);
     const feedbackId = feedback ? `${id}-feedback` : undefined;
 
     // Sensible autofill hints so password managers & browser autofill work.

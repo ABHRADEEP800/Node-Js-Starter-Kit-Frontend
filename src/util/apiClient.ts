@@ -25,15 +25,24 @@ const fetchCsrfToken = async (): Promise<string> => {
 
   isFetchingCsrf = true;
   csrfPromise = fetch(getUrl("/csrf-token"), { credentials: "include" })
-    .then((res) => res.json())
+    .then((res) => {
+      if (!res.ok) throw new Error(`CSRF bootstrap failed (${res.status})`);
+      return res.json();
+    })
     .then((data) => {
-      cachedCsrfToken = data.csrfToken;
-      isFetchingCsrf = false;
-      return cachedCsrfToken as string;
+      if (!data?.csrfToken) throw new Error("CSRF bootstrap returned no token");
+      // Only cache a REAL token — never cache a placeholder, so a transient
+      // failure doesn't poison every later write with a bogus "strict" value.
+      cachedCsrfToken = data.csrfToken as string;
+      return cachedCsrfToken;
     })
     .catch(() => {
+      // Do NOT set cachedCsrfToken, so the next write retries the bootstrap.
+      return "";
+    })
+    .finally(() => {
       isFetchingCsrf = false;
-      return "strict";
+      csrfPromise = null;
     });
 
   return csrfPromise;
@@ -94,16 +103,17 @@ export const apiClient = async (
 
     // If Backend says "401 Unauthorized" (Token expired/invalid)
     if (response.status === 401) {
+      // The cached CSRF token was bound to the now-dead session; drop it so the
+      // next write re-bootstraps a fresh token instead of replaying a stale one
+      // (which would 403 every POST, including login, until a page reload).
+      cachedCsrfToken = null;
       // Check if we are already logged out to prevent infinite loops
       const state = store.getState();
       if (state.auth.status) {
         // A. Dispatch Logout Action immediately
         store.dispatch(logout());
 
-        // B. Optional: Redirect manually if your Router doesn't catch the state change fast enough
-        // window.location.href = "/signin";
-
-        // C. Throw specific error so the calling component knows to stop
+        // B. Throw specific error so the calling component knows to stop
         throw new Error("Session expired. Please login again.");
       }
     }

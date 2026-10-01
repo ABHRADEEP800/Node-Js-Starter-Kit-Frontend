@@ -6,6 +6,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { login, logout } from "./store/auth/authSlice";
 import { Header, Loading } from "./components";
 import Footer from "./components/Footer";
+import CookieConsent from "./components/privacy/CookieConsent";
+import { hydrateDispatchFromStorage } from "./util/consentGate";
+
+// DPDP Domain 8: load the persisted consent dispatch BEFORE first paint so no
+// non-consented tag can fire on the first render.
+hydrateDispatchFromStorage();
 
 function App() {
   const dispatch = useDispatch();
@@ -61,6 +67,8 @@ function App() {
         <Outlet />
       </main>
       <Footer />
+      {/* DPDP Domain 8: consent banner + persistent settings entry point. */}
+      <CookieConsent />
     </div>
   );
 }

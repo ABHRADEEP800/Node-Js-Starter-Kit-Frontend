@@ -3,3 +3,15 @@ export type { User } from "./user";
 export type { UserSignup } from "./userSignup";
 export type { UserLogin } from "./userLogin";
 export type { Passkey } from "./passkey";
+export type {
+  NoticeResponse,
+  PurposesResponse,
+  ConsentStateResponse,
+  AgeStatusResponse,
+  RightsCase,
+  DpoContact,
+  BoardInfo,
+  ConsentPurpose,
+  NoticeItem,
+  GuardianConsentInput,
+} from "./dpdp";

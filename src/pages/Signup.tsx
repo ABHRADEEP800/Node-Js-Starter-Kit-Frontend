@@ -1,17 +1,15 @@
 import { Container } from "../components";
-import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
-
 import RegisterComponent from "../components/register/RegisterComponent";
+import RecaptchaProviderGate from "../components/privacy/RecaptchaProviderGate";
 
 function Signup() {
   return (
     <Container>
-      <GoogleReCaptchaProvider
-        reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
-        scriptProps={{ async: true, defer: true }}
-      >
+      {/* Blocks the form until the anti-bot tracker is allowed, then loads
+          reCAPTCHA and only mounts the form once it is actually ready. */}
+      <RecaptchaProviderGate>
         <RegisterComponent />
-      </GoogleReCaptchaProvider>
+      </RecaptchaProviderGate>
     </Container>
   );
 }
